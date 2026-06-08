@@ -5,11 +5,39 @@ import Source from "@/components/source";
 import { useState } from "react";
 import { PiFireSimpleBold } from "react-icons/pi";
 
+import { StarIcon } from "@animateicons/react/lucide";
+import { ShareIcon } from "@animateicons/react/lucide";
+import { ImFontSize } from "react-icons/im";
+
+import Dock from "@/components/Dock";
+
 export enum PageType {
   Text = "text",
   Links = "links",
   TextWithMedia = "text-with-media",
 }
+
+const items = [
+  {
+    icon: <StarIcon size={30} duration={1.05} color="black" />,
+    label: "Star the page",
+    className: "!bg-amber-50 !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+  {
+    icon: <ShareIcon size={30} duration={1.05} color="black" />,
+    label: "Share the page",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+
+  {
+    icon: <ImFontSize />,
+    label: "Change Font Size",
+    className: "!bg-blue-100  !border-gray-200 !text-black",
+    onClick: () => alert("Camera!"),
+  },
+];
 
 const doc2 = {
   id: "doc_id_1",
@@ -405,13 +433,16 @@ export default function Article() {
     setIdx((prevIdx) => (prevIdx - 1 + data.length) % data.length);
   };
   return (
-    <Page
-      data={doc1}
-      title="Here is the title"
-      index={idx}
-      onNext={handleNext}
-      text="Hey Om you are stronger than you think"
-      onPrev={handlePrev}
-    ></Page>
+    <div>
+      <Page
+        data={doc1}
+        title="Here is the title"
+        index={idx}
+        onNext={handleNext}
+        text="Hey Om you are stronger than you think"
+      ></Page>
+
+     
+    </div>
   );
 }

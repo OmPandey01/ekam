@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Playwrite_GB_J } from "next/font/google";
 import "./globals.css";
 
 import { Coiny } from "next/font/google";
@@ -9,6 +9,10 @@ const coiny = Coiny({
   subsets: ["latin"],
   weight: ["400", "400"],
   variable: "--font-coiny", // This creates a CSS variable
+});
+
+const playwriteEngland = Playwrite_GB_J({
+  variable: "--font-playwrite-england",
 });
 
 const geistSans = Geist({
@@ -34,7 +38,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${playwriteEngland.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

@@ -12,6 +12,7 @@
     /* Creates the 'font-display' utility class automatically */
     --font-display: "Poppins", sans-serif;
     --font-coiny: var(--font-coiny);
+    --font-playwrite: var(--font-playwrite-england), cursive;
 
     /* You can also add custom colors or screens here if needed */
     --color-brand-blue: #0070f3;
@@ -131,13 +132,13 @@
 }
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
+    * {
+        @apply border-border outline-ring/50;
     }
-  body {
-    @apply bg-background text-foreground;
+    body {
+        @apply bg-background text-foreground;
     }
-  html {
-    @apply font-sans;
+    html {
+        @apply font-sans;
     }
 }

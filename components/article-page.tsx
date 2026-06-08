@@ -9,6 +9,34 @@ import { Coiny } from "next/font/google";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
+import { StarIcon } from "@animateicons/react/lucide";
+import { ShareIcon } from "@animateicons/react/lucide";
+import { ImFontSize } from "react-icons/im";
+
+import Dock from "@/components/Dock";
+
+const items = [
+  {
+    icon: <StarIcon size={30} duration={1.05} color="black" />,
+    label: "Star the page",
+    className: "!bg-amber-50 !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+  {
+    icon: <ShareIcon size={30} duration={1.05} color="black" />,
+    label: "Share the page",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+
+  {
+    icon: <ImFontSize />,
+    label: "Change Font Size",
+    className: "!bg-blue-100  !border-gray-200 !text-black",
+    onClick: () => alert("Camera!"),
+  },
+];
+
 const coiny = Coiny({
   subsets: ["latin"],
   weight: "400",
@@ -141,7 +169,7 @@ export function PageContent(props: { page: PageData; onNext: () => void }) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className={`${coiny.className} bg-yellow-50  dark:bg-black w-[50vw] h-40 flex flex-row flex-wrap  justify-center items-center px-6`}
+            className={` font-playwrite  bg-yellow-50  dark:bg-black w-[50vw] h-40 flex flex-row flex-wrap  justify-center items-center px-6`}
           >
             {(page.text || "").split(" ").map((word, index) => (
               <motion.p
@@ -160,6 +188,7 @@ export function PageContent(props: { page: PageData; onNext: () => void }) {
           <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
             <NextButton onClick={props.onNext} />
           </div>
+          <Dock className="left-1 absolute bg-blue-200" items={items}></Dock>
         </motion.div>
       );
 
@@ -167,7 +196,7 @@ export function PageContent(props: { page: PageData; onNext: () => void }) {
       return (
         <motion.div
           key={page.pageId}
-          className={`${coiny.className} bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-4`}
+          className={`font-playwrite bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-4`}
         >
           {page.links?.map((link, index) => (
             <motion.div
