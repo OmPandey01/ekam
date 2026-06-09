@@ -2,7 +2,7 @@
 import { useState } from "react";
 import Source from "./source";
 import NextButton from "@/components/page-turn-button";
-import TimerControl from "@/components/timer";
+
 
 import { AnimatePresence, motion } from "motion/react";
 import { Coiny } from "next/font/google";
@@ -11,32 +11,14 @@ import Image from "next/image";
 
 import { StarIcon } from "@animateicons/react/lucide";
 import { ShareIcon } from "@animateicons/react/lucide";
+import { TiArrowLeftThick } from "react-icons/ti";
+import { TiArrowRightThick } from "react-icons/ti";
 import { ImFontSize } from "react-icons/im";
 
 import Dock from "@/components/Dock";
+import { Text } from "lucide-react";
 
-const items = [
-  {
-    icon: <StarIcon size={30} duration={1.05} color="black" />,
-    label: "Star the page",
-    className: "!bg-amber-50 !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
-  },
-  {
-    icon: <ShareIcon size={30} duration={1.05} color="black" />,
-    label: "Share the page",
-    className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
-  },
-
-  {
-    icon: <ImFontSize />,
-    label: "Change Font Size",
-    className: "!bg-blue-100  !border-gray-200 !text-black",
-    onClick: () => alert("Camera!"),
-  },
-];
-
+  
 const coiny = Coiny({
   subsets: ["latin"],
   weight: "400",
@@ -136,27 +118,115 @@ export default function Page(props: {
   onNext?: () => void;
   text?: string;
 }) {
+
+
+    const handleNext = () => {
+    const nextIndex = (index + 1) % pages.length;
+    setIndex(nextIndex);
+  };
+  const handlePrev = () => {
+    const prevIndex = (index - 1 + pages.length) % pages.length;
+    setIndex(prevIndex);
+  };
+
+ const items = [
+    {
+    icon: <TiArrowLeftThick />,
+    label: " Previous Page",
+    className: "!bg-green-200  !border-gray-200 !text-black",
+    onClick:handlePrev,
+  },
+  {
+    icon: <StarIcon size={30} duration={1.05} color="black" />,
+    label: "Star the page",
+    className: "!bg-amber-50 !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+  {
+    icon: <ShareIcon size={30} duration={1.05} color="black" />,
+    label: "Share the page",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+
+  {
+    icon: <ImFontSize />,
+    label: "Change Font Size",
+    className: "!bg-blue-100  !border-gray-200 !text-black",
+    onClick: () => alert("Camera!"),
+  },
+
+  {
+    icon: <TiArrowRightThick />,
+    label: "Next Page",
+    className: "!bg-green-200  !border-gray-200 !text-black",
+    onClick:handleNext,
+  },
+];
+
+
+
+
+
   const doc = props.data;
   const pages = doc.pages;
   const [index, setIndex] = useState(0);
   const page = pages[index];
 
-  const handleNext = () => {
-    const nextIndex = (index + 1) % pages.length;
-    setIndex(nextIndex);
-  };
+
   return (
     <div
-      className={`${coiny.className} bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6`}
+      className={`${coiny.className} bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
     >
-      <PageContent page={page} onNext={handleNext} />
+      <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
+      <div className="absolute bottom-0 w-full flex justify-center z-50 pointer-events-none">
+        <div className="pointer-events-auto">
+          <Dock className="bg-blue-200" items={items}></Dock>
+        </div>
+      </div>
     </div>
   );
 }
 
-export function PageContent(props: { page: PageData; onNext: () => void }) {
+export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:()=>void}) {
   const page = props.page;
   const router = useRouter();
+
+  const items = [
+    {
+    icon: <TiArrowLeftThick />,
+    label: " Previous Page",
+    className: "!bg-green-200  !border-gray-200 !text-black",
+    onClick:props.onPrev,
+  },
+  {
+    icon: <StarIcon size={30} duration={1.05} color="black" />,
+    label: "Star the page",
+    className: "!bg-amber-50 !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+  {
+    icon: <ShareIcon size={30} duration={1.05} color="black" />,
+    label: "Share the page",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick: () => alert("Page Starred!"),
+  },
+
+  {
+    icon: <ImFontSize />,
+    label: "Change Font Size",
+    className: "!bg-blue-100  !border-gray-200 !text-black",
+    onClick: () => alert("Camera!"),
+  },
+
+  {
+    icon: <TiArrowRightThick />,
+    label: "Next Page",
+    className: "!bg-green-200  !border-gray-200 !text-black",
+    onClick:props.onNext,
+  },
+];
+
 
   if (!page) return null;
 
@@ -169,26 +239,18 @@ export function PageContent(props: { page: PageData; onNext: () => void }) {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className={` font-playwrite  bg-yellow-50  dark:bg-black w-[50vw] h-40 flex flex-row flex-wrap  justify-center items-center px-6`}
+            className={` font-playwrite  bg-yellow-50 mb-30  dark:bg-black w-[50vw] h-[80vh] flex flex-row flex-wrap  justify-center items-center px-6 my-10 `}
           >
-            {(page.text || "").split(" ").map((word, index) => (
-              <motion.p
-                variants={wordVariants}
-                className="text-3xl md:text-4xl mx-1 my-0.5"
-                key={`${page.pageId}-${index}`}
-              >
-                {word}
-              </motion.p>
-            ))}
+          <TextRenderer
+            onAnimationComplete={() => {}}
+            text={page.text || ""}
+            index={0}
+          ></TextRenderer>
           </motion.div>
 
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute top-20 right-10">
-            <TimerControl onClick={props.onNext} />
-          </div>
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
-            <NextButton onClick={props.onNext} />
-          </div>
-          <Dock className="left-1 absolute bg-blue-200" items={items}></Dock>
+
+       
+
         </motion.div>
       );
 
@@ -217,12 +279,8 @@ export function PageContent(props: { page: PageData; onNext: () => void }) {
               <p className="px-4 text-center truncate">{link.text}</p>
             </motion.div>
           ))}
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute top-20 right-10">
-            <TimerControl onClick={props.onNext} />
-          </div>
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
-            <NextButton onClick={props.onNext} />
-          </div>
+      
+         
         </motion.div>
       );
 
@@ -253,9 +311,9 @@ export function PageContent1(props: {
           initial="hidden"
           animate="visible"
           transition={{ duration: 100 }}
-          className={`${coiny.className} bg-yellow-50 w-screen h-screen flex flex-col justify-center items-center px-6`}
+          className={`${coiny.className} bg-yellow-50 w-screen h-screen flex flex-col justify-center items-center px-6 md:px-0`}
         >
-          <div className="  flex flex-row flex-wrap justify-center content-center gap-y-2 max-w-xl">
+          <div className="  flex flex-row flex-wrap justify-center content-center gap-y-2 ">
             {(page.text || "").split(" ").map((word, index) => (
               <motion.p
                 variants={wordVariants}
@@ -269,12 +327,7 @@ export function PageContent1(props: {
             ))}
           </div>
 
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute top-20 right-10">
-            <TimerControl onClick={props.onNext} />
-          </div>
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
-            <NextButton onClick={props.onNext} />
-          </div>
+      
         </motion.div>
       );
 
@@ -303,15 +356,7 @@ export function PageContent1(props: {
               <p className="px-4 text-center truncate">{link.text}</p>
             </motion.div>
           ))}
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute top-20 right-10">
-            <TimerControl onClick={props.onNext} />
-          </div>
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
-            <NextButton onClick={props.onNext} />
-          </div>
-          <div className="w-[150px] h-[70px] rounded-full flex flex-col justify-center items-center absolute bottom-10 right-10">
-            <NextButton onClick={props.onPrev} />
-          </div>
+        
         </motion.div>
       );
 
@@ -330,61 +375,77 @@ function TextWithMedia(props: {
 }) {
   const [textDone, setTextDone] = useState(false);
   const [currImage, setCurrImage] = useState<number | null>(null);
+  const [slideIndex, setSlideIndex] = useState(0);
 
-  function handleImageHoverStart(index: number) {
-    setCurrImage(index);
+  function handleImageHoverStart() {
+    setCurrImage(slideIndex);
   }
-  function handleImageHoverEnd(index: number) {
+  function handleImageHoverEnd() {
     setCurrImage(null);
   }
+
   const page = props.data;
+
+  const handleNextSlide = () => {
+    if (page.media) {
+      setSlideIndex((prev) => (prev + 1) % page.media!.length);
+    }
+  };
+
+  const handlePrevSlide = () => {
+    if (page.media) {
+      setSlideIndex((prev) => (prev - 1 + page.media!.length) % page.media!.length);
+    }
+  };
+
   return (
     <motion.div
       key={page.pageId}
-      className="bg-yellow-50dark:bg-black w-screen  flex flex-row justify-center items-center relative"
+      className="bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col md:flex-row justify-center items-center relative overflow-hidden"
     >
-      <motion.div
-        className=" h-auto relative w-full  overflow-x-auto scroll-smooth snap-y snap-mandatory flex flex-col justify-center items-center"
-        style={{
-          maskImage:
-            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-          WebkitMaskImage:
-            "linear-gradient(to right, transparent, black 10%, black 90%, transparent)",
-        }}
-      >
-        <motion.div
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          className="grid grid-cols-2  h-auto w-full items-center justify-center gap-4 px-8"
-        >
-          {page.media?.map((mediaItem, index) => (
-            <motion.div
-              key={index}
-              variants={imageVariant}
-              initial="hidden"
-              animate="visible"
-              whileHover={{
-                scale: 1.1,
-                marginLeft: 30,
-                marginRight: 10,
-              }}
-              onMouseEnter={() => handleImageHoverStart(index)}
-              onMouseLeave={() => handleImageHoverEnd(index)}
-              className="col-start-auto snap-start shrink-0"
+      <div className="w-full md:w-1/2 h-1/2 md:h-full flex flex-row justify-center items-center relative p-4 md:p-8 shrink-0">
+        {page.media && page.media.length > 0 && (
+          <>
+            <button
+              onClick={handlePrevSlide}
+              className="absolute left-2 md:left-8 z-10 p-2 md:p-3 bg-blue-100 text-black rounded-full hover:bg-blue-300 transition-colors shadow-lg cursor-pointer"
             >
-              <Image
-                src={mediaItem.url}
-                height={400}
-                width={400}
-                alt="Image"
-                className="rounded-3xl object-cover my-5"
-              />
-            </motion.div>
-          ))}
-        </motion.div>
-      </motion.div>
-      <div>
+              <TiArrowLeftThick size={24} className="md:w-10 md:h-10"/>
+            </button>
+
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={slideIndex}
+                initial={{ opacity: 0, y: 100, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -100, scale: 0.9 }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                onMouseEnter={handleImageHoverStart}
+                onMouseLeave={handleImageHoverEnd}
+                className="w-full h-full flex justify-center items-center"
+                whileHover={{ scale: 1.05 }}
+              >
+                <Image
+                  src={page.media[slideIndex].url}
+                  height={800}
+                  width={800}
+                  alt="Image"
+                  className="rounded-3xl object-contain max-h-[40vh] md:max-h-[80vh] w-auto shadow-2xl"
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            <button
+              onClick={handleNextSlide}
+              className="absolute right-2 md:right-8 z-10 p-2 md:p-3 bg-blue-100 text-black rounded-full hover:bg-blue-300 transition-colors shadow-lg cursor-pointer"
+            >
+              <TiArrowRightThick size={24} className="md:w-10 md:h-10"/>
+            </button>
+          </>
+        )}
+      </div>
+
+      <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center items-center px-4 overflow-hidden relative">
         <TextRenderer
           onAnimationComplete={() => setTextDone(true)}
           text={page.text || ""}
@@ -395,18 +456,16 @@ function TextWithMedia(props: {
       <AnimatePresence>
         {currImage !== null && page.media && (
           <motion.div
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: -10 }}
-            exit={{ opacity: 0.5, x: 10, transition: { duration: 1 } }}
-            className="absolute right-10 bottom-20  h-auto mt-2 bg-green-200 shadow-2xl rounded-lg p-2 w-128 flex flex-col justify-center items-center"
+            initial={{ opacity: 0, y: 50, x: "-50%" }}
+            animate={{ opacity: 1, y: 0, x: "-50%" }}
+            exit={{ opacity: 0, y: 50, x: "-50%", transition: { duration: 0.3 } }}
+            className="absolute left-1/4 bottom-20 z-20 h-auto bg-green-200 shadow-2xl rounded-xl p-4 w-[400px] flex flex-col justify-center items-center text-black pointer-events-none"
           >
-            <p className="text-2xl">{page.media[currImage].description}</p>
+            <p className="text-2xl text-center">{page.media[currImage].description}</p>
           </motion.div>
         )}
       </AnimatePresence>
-      <div className="w-[150px] h-[70px] rounded-full flex flex-row justify-center items-center  absolute bottom-14 right-10">
-        <NextButton onClick={props.onNext} />
-      </div>
+     
     </motion.div>
   );
 }
@@ -423,13 +482,13 @@ function TextRenderer(props: {
       initial="hidden"
       animate="visible"
       onAnimationComplete={props.onAnimationComplete}
-      className={` ${coiny.className} h-full flex flex-col justify-center items-center px-10`}
+      className={` ${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
     >
-      <div className="  flex flex-row flex-wrap m-3 justify-center items-center h-screen  w-[70vw] content-center max-w-2xl">
+      <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
         {props.text.split(" ").map((word, index) => (
           <motion.p
             variants={wordVariants}
-            className="text-3xl md:text-4xl mx-1 my-0.5"
+            className="text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5"
             key={`${props.index}-${index}`}
           >
             {word}
