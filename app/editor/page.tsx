@@ -54,11 +54,11 @@ const pageTypes = [
 export default function EditorPage() {
   const [currPage, setPage] = useState("text");
 
-  const [page, setPage];
+
   return (
     <div className="flex flex-row w-full h-screen">
       <div className="bg-amber-50 w-full  border-r-green-500 border-r-5 h-screen">
-        <div className="bg-blue-300 h-screen w-80">
+        <div className="bg-yellow-300 h-screen w-80">
           <div className="bg-gray-400 m-4 rounded-full h-12 w-full">
             <Dock
               items={items}

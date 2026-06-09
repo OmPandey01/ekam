@@ -14,9 +14,13 @@ import { ShareIcon } from "@animateicons/react/lucide";
 import { TiArrowLeftThick } from "react-icons/ti";
 import { TiArrowRightThick } from "react-icons/ti";
 import { ImFontSize } from "react-icons/im";
+import { HouseIcon } from "@animateicons/react/lucide";
+import { PlayIcon } from "@animateicons/react/lucide";
 
 import Dock from "@/components/Dock";
 import { Text } from "lucide-react";
+
+import ComingSoonDialog from "@/components/ComingSoonDialog";
 
   
 const coiny = Coiny({
@@ -116,10 +120,9 @@ export default function Page(props: {
   title?: string;
   index?: number;
   onNext?: () => void;
+
   text?: string;
 }) {
-
-
     const handleNext = () => {
     const nextIndex = (index + 1) % pages.length;
     setIndex(nextIndex);
@@ -128,6 +131,13 @@ export default function Page(props: {
     const prevIndex = (index - 1 + pages.length) % pages.length;
     setIndex(prevIndex);
   };
+
+  const [comingSoonOpen, setComingSoonOpen] = useState(false);
+
+  const handleComingSoonPopup=()=>{
+    setComingSoonOpen(!comingSoonOpen);
+  }
+
 
  const items = [
     {
@@ -140,20 +150,32 @@ export default function Page(props: {
     icon: <StarIcon size={30} duration={1.05} color="black" />,
     label: "Star the page",
     className: "!bg-amber-50 !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
+    onClick: handleComingSoonPopup,
   },
   {
     icon: <ShareIcon size={30} duration={1.05} color="black" />,
     label: "Share the page",
     className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
+    onClick:  handleComingSoonPopup,
+  },
+  {
+    icon: <HouseIcon size={30} duration={1.05} color="black" />,
+    label: "Go to Home",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick: handleComingSoonPopup,
+  },
+  {
+    icon: <PlayIcon size={30} duration={1.05} color="black" />,
+    label: "Go to Home",
+    className: "!bg-green-50  !border-gray-200 !text-black",
+    onClick:  handleComingSoonPopup,
   },
 
   {
     icon: <ImFontSize />,
     label: "Change Font Size",
     className: "!bg-blue-100  !border-gray-200 !text-black",
-    onClick: () => alert("Camera!"),
+    onClick:  handleComingSoonPopup,
   },
 
   {
@@ -172,13 +194,20 @@ export default function Page(props: {
   const pages = doc.pages;
   const [index, setIndex] = useState(0);
   const page = pages[index];
+  const [showNavigation,setShowNavigation] = useState(false);
+  const handleNavigationToggle = () => {
+    setShowNavigation((prev) => !prev);
+  };
 
 
   return (
     <div
-      className={`${coiny.className} bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
+      className={`${coiny.className} bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
     >
       <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
+
+       <ComingSoonDialog open={comingSoonOpen} onOpenChange={handleComingSoonPopup}/>
+      
       <div className="absolute bottom-0 w-full flex justify-center z-50 pointer-events-none">
         <div className="pointer-events-auto">
           <Dock className="bg-blue-200" items={items}></Dock>
@@ -192,40 +221,6 @@ export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:
   const page = props.page;
   const router = useRouter();
 
-  const items = [
-    {
-    icon: <TiArrowLeftThick />,
-    label: " Previous Page",
-    className: "!bg-green-200  !border-gray-200 !text-black",
-    onClick:props.onPrev,
-  },
-  {
-    icon: <StarIcon size={30} duration={1.05} color="black" />,
-    label: "Star the page",
-    className: "!bg-amber-50 !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
-  },
-  {
-    icon: <ShareIcon size={30} duration={1.05} color="black" />,
-    label: "Share the page",
-    className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick: () => alert("Page Starred!"),
-  },
-
-  {
-    icon: <ImFontSize />,
-    label: "Change Font Size",
-    className: "!bg-blue-100  !border-gray-200 !text-black",
-    onClick: () => alert("Camera!"),
-  },
-
-  {
-    icon: <TiArrowRightThick />,
-    label: "Next Page",
-    className: "!bg-green-200  !border-gray-200 !text-black",
-    onClick:props.onNext,
-  },
-];
 
 
   if (!page) return null;
@@ -239,7 +234,7 @@ export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className={` font-playwrite  bg-yellow-50 mb-30  dark:bg-black w-[50vw] h-[80vh] flex flex-row flex-wrap  justify-center items-center px-6 my-10 `}
+            className={` md:w-[50vw] font-playwrite rounded-2xl mb-30  dark:bg-black w-[90vw] h-[90vh] flex flex-row flex-wrap  justify-center items-center px-6 my-10 `}
           >
           <TextRenderer
             onAnimationComplete={() => {}}
@@ -335,7 +330,7 @@ export function PageContent1(props: {
       return (
         <motion.div
           key={page.pageId}
-          className={` bg-yellow-50 w-screen h-screen flex flex-col justify-center items-center px-4`}
+          className={` bg-blue-50 w-screen h-screen flex flex-col justify-center items-center px-4`}
         >
           {page.links?.map((link, index) => (
             <motion.div
@@ -470,10 +465,12 @@ function TextWithMedia(props: {
   );
 }
 
-function TextRenderer(props: {
+export function TextRenderer(props: {
   text: string;
   index?: number;
   onAnimationComplete?: () => void;
+  size?: "sm" | "md" | "lg";
+  height?: number;
 }) {
   return (
     <motion.div
@@ -488,7 +485,7 @@ function TextRenderer(props: {
         {props.text.split(" ").map((word, index) => (
           <motion.p
             variants={wordVariants}
-            className="text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5"
+            className={`${props.height ? `h-${props.height}` : ''} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
             key={`${props.index}-${index}`}
           >
             {word}
