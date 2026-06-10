@@ -1,29 +1,10 @@
+// app/layout.tsx - Server Component
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playwrite_GB_J } from "next/font/google";
+import { Geist, Geist_Mono, Playwrite_GB_J, Coiny } from "next/font/google";
 import "./globals.css";
+import ClientLayout from "@/components/layout/client-layout";
 
-import { Coiny } from "next/font/google";
-
-//font Coiny css variable
-const coiny = Coiny({
-  subsets: ["latin"],
-  weight: ["400", "400"],
-  variable: "--font-coiny", // This creates a CSS variable
-});
-
-const playwriteEngland = Playwrite_GB_J({
-  variable: "--font-playwrite-england",
-});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+// ... font definitions ...
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -32,15 +13,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${playwriteEngland.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">{children}</body>
+    <html lang="en" className={`... fonts ...`}>
+      <body className="min-h-full flex flex-col">
+        <ClientLayout>{children}</ClientLayout> {/* ← ONLY this */}
+      </body>
     </html>
   );
 }

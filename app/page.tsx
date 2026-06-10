@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 
 import { FaPlus } from "react-icons/fa";
+import ArticleCard from "@/components/article-card";
+import { doc1 } from "@/data/data";
 
 export default function Home() {
   const router = useRouter();
@@ -12,19 +14,19 @@ export default function Home() {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="bg-yellow-50 rounded-3xl h-screen w-full flex justify-center items-center p-10"
+      className="bg-yellow-50 rounded-3xl h-screen w-full flex justify-between items-center p-0"
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0 }}
-        animate={{ opacity: 1, scale: 1, transition: { duration: 0.8 } }}
-        whileHover={{ scale: 1.1 }}
-        exit={{ opacity: 0, scale: 0 }}
+        initial={{ opacity: 1, y: -20 }}
+        animate={{ y: 0, transition: { duration: 0.3 } }}
+        whileHover={{ scale: 1.05 }}
+        exit={{ opacity: 0, y: -100 }}
         onClick={() => {
           router.push("/article");
         }}
-        className="bg-blue-400 rounded-3xl h-30 w-70 flex justify-center items-center p-10"
+        className="rounded-3xl h-40 flex justify-between items-center p-5"
       >
-        <p>Articles on strongness</p>
+        <ArticleCard document={doc1} />
       </motion.div>
 
       <motion.div

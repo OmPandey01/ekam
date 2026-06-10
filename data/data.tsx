@@ -1,15 +1,12 @@
-
-//Guideline for content 
-// I am making this platform specifically to make reading more engaging and interactive for everyone. 
+//Guideline for content
+// I am making this platform specifically to make reading more engaging and interactive for everyone.
 // So the content should be concise, engaging and informative.
-//  It should be written in a way that captures the reader's attention and keeps them interested 
+//  It should be written in a way that captures the reader's attention and keeps them interested
 // throughout the document.
 //  The content should also be well-researched and accurate,
 //  providing valuable information to the reader. Additionally,
-//  it should be organized in a clear and logical manner, making it easy for readers to follow along 
+//  it should be organized in a clear and logical manner, making it easy for readers to follow along
 // and understand the key points being presented.
-
-
 
 export enum PageType {
   Text = "text",
@@ -17,66 +14,156 @@ export enum PageType {
   TextWithMedia = "text-with-media",
 }
 
-type Media={
-    url:string,
-    description:string,
-    height:number,
-    width:number,
+type Media = {
+  type: "image";
+  url: string;
+  description: string;
+  height?: number;
+  width?: number;
+  details?: any;
+};
+
+type Link = {
+  url: string;
+  description: string;
+  priority?: number;
+};
+
+type PageStyle = {
+  backgroundType?: "color" | "image" | "gradient";
+  backgroundColor?: string;
+  backgroundImage?: string;
+};
+
+enum SoundEffect {
+  None = "none",
+  glass = "glass",
+  paper = "paper",
+  typing = "typing",
+  nature = "nature",
+  city = "city",
+  crowd = "crowd",
+  music = "music",
 }
 
-type Link={
-    url:string,
-    description:string,
-    priority?:number,
-}
+type BasePage = {
+  pageId: string;
+  text: string;
+};
 
-type PageStyle={
-    backgroundType?:"color"|"image"|"gradient",
-    backgroundColor?:string,
-    backgroundImage?:string,
-}
+export type Page = BasePage &
+  (
+    | {
+        type: PageType.Text;
+      }
+    | {
+        type: PageType.Links;
+        links: Link[];
+      }
+    | {
+        type: PageType.TextWithMedia;
+        media: Media[];
+      }
+  ) &
+  PageStyle;
 
-enum SoundEffect{
-    None="none",
-    glass="glass",
-    paper="paper",
-    typing="typing",
-    nature="nature",
-    city="city",
-    crowd="crowd",
-    music="music",
+export type Document = {
+  id: string;
+  title: string;
+  thumbnailUrl?: string;
+  stats?: { likes: string; repost: string; upvote: string };
+  pages: Page[];
+  author?: string;
+  date?: string;
+  music?: SoundEffect;
+};
 
-}
+export const human_evolution: Document = {
+  id: "human_evolution_1",
+  title: "Let's Explore Human Evolution",
+  thumbnailUrl:
+    "https://cdn.pixabay.com/photo/2019/04/10/03/38/kid-4116127_1280.jpg",
+  author: "Om Pandey",
+  date: "12-05-2026",
+  stats: { likes: "23", repost: "22", upvote: "122" },
+  pages: [
+    {
+      pageId: "human_evolution_page_1",
+      type: PageType.Text,
+      text: "human evolution, the process by which human beings developed on Earth from now-extinct primates.",
+    },
+    {
+      pageId: "human_evolution_page_2",
+      type: PageType.TextWithMedia,
+      text: " we humans are Homo sapiens, a culture-bearing upright-walking species that lives on the ground and very likely first evolved in Africa about 315,000 years ago.",
+      media: [
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2024/10/02/18/32/ai-generated-9091918_1280.jpg",
+          description: "Image of a Homosepien",
+          height: 200,
+          width: 400,
+        },
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2016/09/16/21/19/death-1675157_1280.jpg",
+          description: "Remains of a Human Head",
+          height: 200,
+          width: 400,
+        },
+      ],
+    },
+    {
+      pageId: "human_evolution_page_3",
+      type: PageType.Text,
+      text: "We are now the only living members of what many zoologists refer to as the human tribe, Hominini,",
+    },
+    {
+      pageId: "human_evolution_page_4",
+      type: PageType.Text,
+      text: "but there is abundant fossil evidence to indicate that we were preceded for millions of years by other hominins, such as Ardipithecus, Australopithecus, and other species of Homo, and that our species also lived for a time contemporaneously with at least one other member of our genus, H. neanderthalensis (the Neanderthals). ",
+    },
+    {
+      pageId: "human_evolution_page_5",
+      type: PageType.TextWithMedia,
+      text: " In addition, we and our predecessors have always shared Earth with other apelike primates, from the modern-day gorilla to the long-extinct Dryopithecus.",
+      media: [
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2023/06/21/08/58/monkey-8078840_1280.jpg",
+          description: "Priamate",
+        },
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2017/04/02/06/21/monkey-2195107_1280.jpg",
+          description: "Priamate",
+        },
+      ],
+    },
+    {
+      pageId: "human_evolution_page_6",
+      type: PageType.Text,
+      text: "Darwin never claimed, as some of his Victorian contemporaries insisted he had, that “man was descended from the apes,” and modern scientists would view such a statement as a useless simplification—just as they would dismiss any popular notions that a certain extinct species is the “missing link” between humans and the apes. ",
+    },
+    {
+      pageId: "human_evolution_page_7",
+      type: PageType.Text,
+      text: 'There is theoretically, however, a common ancestor that existed millions of years ago. This ancestral species does not constitute a "missing link" along a lineage but rather a node for divergence into separate lineages.',
+    },
+    {
+      pageId: "human_evolution_page_8",
+      type: PageType.Text,
+      text: 'There is theoretically, however, a common ancestor that existed millions of years ago. This ancestral species does not constitute a "missing link" along a lineage but rather a node for divergence into separate lineages.',
+    },
+    {
+      pageId: "human_evolution_page_9",
+      type: PageType.Text,
+      text: "This ancient primate has not been identified and may never be known with certainty, because fossil relationships are unclear even within the human lineage, which is more recent. In fact, the human “family tree” may be better described as a “family bush,” within which it is impossible to connect a full chronological series of species, leading to Homo sapiens, that experts can agree upon.",
+    },
+  ],
+};
 
-type BasePage={
-    pageId:string,
-    text:string
-
-}
-
-export type Page= BasePage &
-(
-|{
-    type:PageType.Text,
-}
-|{
-   
-    type:PageType.Links,
-    links:Link[] 
-}
-|{
-   
-    type:PageType.TextWithMedia,
-    media:Media[]
-} )& PageStyle;
-
-export type Document={
-    id:string,
-    pages:Page[]
-    music?:SoundEffect
-}
-
-
+export const doc1 = human_evolution;
 // Initial Mock data
 
 export const doc12 = {
@@ -264,91 +351,96 @@ export const doc12 = {
   ],
 };
 
-
-export const doc1={
-  "id": "climate-impact-india-001",
-  "music": "nature",
-  "pages": [
+export const doc13 = {
+  id: "climate-impact-india-001",
+  music: "nature",
+  pages: [
     {
-      "pageId": "p1-thermal-shift",
-      "type": "text-with-media",
-      "text": "India's climate baseline is undergoing rapid destabilization. Between 1901 and 2018, the national average temperature rose by approximately 0.7°C. This thermal shift accelerates the retreat of Himalayan glaciers—the primary hydrological regulators for the Ganges and Brahmaputra river basins. The immediate consequence is a critical disruption in the perennial water supply infrastructure that sustains northern India.",
-      "media": [
+      pageId: "p1-thermal-shift",
+      type: "text-with-media",
+      text: "India's climate baseline is undergoing rapid destabilization. Between 1901 and 2018, the national average temperature rose by approximately 0.7°C. This thermal shift accelerates the retreat of Himalayan glaciers—the primary hydrological regulators for the Ganges and Brahmaputra river basins. The immediate consequence is a critical disruption in the perennial water supply infrastructure that sustains northern India.",
+      media: [
         {
-          "url": "https://plus.unsplash.com/premium_photo-1664298311043-46b3814a511f?q=80&w=1766&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-          "description": "Barren rocky terrain illustrating the geological impact of changing arid conditions.",
-          "height": 1080,
-          "width": 1920
-        }
+          url: "https://plus.unsplash.com/premium_photo-1664298311043-46b3814a511f?q=80&w=1766&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          description:
+            "Barren rocky terrain illustrating the geological impact of changing arid conditions.",
+          height: 1080,
+          width: 1920,
+        },
       ],
-      "backgroundType": "color",
-      "backgroundColor": "#121212"
+      backgroundType: "color",
+      backgroundColor: "#121212",
     },
     {
-      "pageId": "p2-monsoon-volatility",
-      "type": "text-with-media",
-      "text": "The Indian monsoon system acts as the primary driver for the agricultural sector. However, atmospheric warming has induced severe volatility in precipitation cycles. Meteorological data indicates a sharp increase in the frequency of extreme, concentrated rainfall events juxtaposed with prolonged dry spells. This structural shift degrades soil mechanics, suppresses crop yields, and directly threatens the nation's food supply chain.",
-      "media": [
+      pageId: "p2-monsoon-volatility",
+      type: "text-with-media",
+      text: "The Indian monsoon system acts as the primary driver for the agricultural sector. However, atmospheric warming has induced severe volatility in precipitation cycles. Meteorological data indicates a sharp increase in the frequency of extreme, concentrated rainfall events juxtaposed with prolonged dry spells. This structural shift degrades soil mechanics, suppresses crop yields, and directly threatens the nation's food supply chain.",
+      media: [
         {
-          "url": "https://images.unsplash.com/photo-1647193618898-23d2294048af?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-          "description": "Agricultural fields under changing weather patterns.",
-          "height": 1080,
-          "width": 1920
-        }
+          url: "https://images.unsplash.com/photo-1647193618898-23d2294048af?q=80&w=870&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          description: "Agricultural fields under changing weather patterns.",
+          height: 1080,
+          width: 1920,
+        },
       ],
-      "backgroundType": "color",
-      "backgroundColor": "#18181b"
+      backgroundType: "color",
+      backgroundColor: "#18181b",
     },
     {
-      "pageId": "p3-coastal-inundation",
-      "type": "text-with-media",
-      "text": "India's 7,500-kilometer coastline exposes massive metropolitan centers and logistical hubs to rising sea levels. Cyclonic activity in the Arabian Sea has intensified by over 50% in recent decades due to elevated sea surface temperatures. The resulting storm surges induce severe coastal flooding, while subsurface saltwater intrusion fundamentally ruins coastal freshwater aquifers.",
-      "media": [
+      pageId: "p3-coastal-inundation",
+      type: "text-with-media",
+      text: "India's 7,500-kilometer coastline exposes massive metropolitan centers and logistical hubs to rising sea levels. Cyclonic activity in the Arabian Sea has intensified by over 50% in recent decades due to elevated sea surface temperatures. The resulting storm surges induce severe coastal flooding, while subsurface saltwater intrusion fundamentally ruins coastal freshwater aquifers.",
+      media: [
         {
-          "url": "https://images.unsplash.com/photo-1741836315165-89e7dfd61613?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-          "description": "Vessels navigating encroaching water levels near coastal infrastructures.",
-          "height": 1080,
-          "width": 1920
-        }
+          url: "https://images.unsplash.com/photo-1741836315165-89e7dfd61613?q=80&w=1740&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+          description:
+            "Vessels navigating encroaching water levels near coastal infrastructures.",
+          height: 1080,
+          width: 1920,
+        },
       ],
-      "backgroundType": "color",
-      "backgroundColor": "#0f172a"
+      backgroundType: "color",
+      backgroundColor: "#0f172a",
     },
     {
-      "pageId": "p4-macroeconomic-strain",
-      "type": "text",
-      "text": "The macroeconomic impact is highly quantifiable. Extreme heatwaves severely reduce labor productivity, particularly in the construction and agricultural sectors, projecting a potential loss of up to 4.5% of India's GDP by 2030. Concurrently, changing temperature gradients allow vector-borne diseases to migrate into previously unaffected higher altitudes, systematically increasing the operational strain on public healthcare infrastructure.",
-      "backgroundType": "color",
-      "backgroundColor": "#1e1b4b"
+      pageId: "p4-macroeconomic-strain",
+      type: "text",
+      text: "The macroeconomic impact is highly quantifiable. Extreme heatwaves severely reduce labor productivity, particularly in the construction and agricultural sectors, projecting a potential loss of up to 4.5% of India's GDP by 2030. Concurrently, changing temperature gradients allow vector-borne diseases to migrate into previously unaffected higher altitudes, systematically increasing the operational strain on public healthcare infrastructure.",
+      backgroundType: "color",
+      backgroundColor: "#1e1b4b",
     },
     {
-      "pageId": "p5-mitigation-protocols",
-      "type": "links",
-      "text": "Addressing these systemic shifts requires aggressive mitigation and adaptation protocols. The government and economic sectors are beginning to implement structural changes, ranging from green taxonomy and carbon market integration to massive expansions in renewable energy infrastructure. Review the technical reports and articles below to explore India's climate trajectory and policy responses.",
-      "links": [
+      pageId: "p5-mitigation-protocols",
+      type: "links",
+      text: "Addressing these systemic shifts requires aggressive mitigation and adaptation protocols. The government and economic sectors are beginning to implement structural changes, ranging from green taxonomy and carbon market integration to massive expansions in renewable energy infrastructure. Review the technical reports and articles below to explore India's climate trajectory and policy responses.",
+      links: [
         {
-          "url": "https://www.grantthornton.in/insights/articles/in-2026-climate-change-to-become-indias-defining-economic-variable/",
-          "description": "In 2026, climate change to become India's defining economic variable - Grant Thornton",
-          "priority": 1
+          url: "https://www.grantthornton.in/insights/articles/in-2026-climate-change-to-become-indias-defining-economic-variable/",
+          description:
+            "In 2026, climate change to become India's defining economic variable - Grant Thornton",
+          priority: 1,
         },
         {
-          "url": "https://www.drishtiias.com/daily-updates/daily-news-analysis/state-of-indias-environment-2026",
-          "description": "State of India's Environment 2026 - Drishti IAS Report on Planetary Boundaries",
-          "priority": 2
+          url: "https://www.drishtiias.com/daily-updates/daily-news-analysis/state-of-indias-environment-2026",
+          description:
+            "State of India's Environment 2026 - Drishti IAS Report on Planetary Boundaries",
+          priority: 2,
         },
         {
-          "url": "https://ccpi.org/country/ind/",
-          "description": "India – Climate Performance Ranking 2026 | CCPI Analysis",
-          "priority": 3
+          url: "https://ccpi.org/country/ind/",
+          description:
+            "India – Climate Performance Ranking 2026 | CCPI Analysis",
+          priority: 3,
         },
         {
-          "url": "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2268795",
-          "description": "India's Green Transformation - Press Information Bureau (PIB) 2026 Update",
-          "priority": 4
-        }
+          url: "https://www.pib.gov.in/PressReleasePage.aspx?PRID=2268795",
+          description:
+            "India's Green Transformation - Press Information Bureau (PIB) 2026 Update",
+          priority: 4,
+        },
       ],
-      "backgroundType": "color",
-      "backgroundColor": "#0f172a"
-    }
-  ]
+      backgroundType: "color",
+      backgroundColor: "#0f172a",
+    },
+  ],
 };

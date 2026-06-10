@@ -3,7 +3,6 @@ import { useState } from "react";
 import Source from "./source";
 import NextButton from "@/components/page-turn-button";
 
-
 import { AnimatePresence, motion } from "motion/react";
 import { Coiny } from "next/font/google";
 import { useRouter } from "next/navigation";
@@ -22,7 +21,6 @@ import { Text } from "lucide-react";
 
 import ComingSoonDialog from "@/components/ComingSoonDialog";
 
-  
 const coiny = Coiny({
   subsets: ["latin"],
   weight: "400",
@@ -123,7 +121,9 @@ export default function Page(props: {
 
   text?: string;
 }) {
-    const handleNext = () => {
+  const router = useRouter();
+
+  const handleNext = () => {
     const nextIndex = (index + 1) % pages.length;
     setIndex(nextIndex);
   };
@@ -134,71 +134,65 @@ export default function Page(props: {
 
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
 
-  const handleComingSoonPopup=()=>{
+  const handleComingSoonPopup = () => {
     setComingSoonOpen(!comingSoonOpen);
-  }
+  };
 
-
- const items = [
+  const items = [
     {
-    icon: <TiArrowLeftThick />,
-    label: " Previous Page",
-    className: "!bg-green-200  !border-gray-200 !text-black",
-    onClick:handlePrev,
-  },
-  {
-    icon: <StarIcon size={30} duration={1.05} color="black" />,
-    label: "Star the page",
-    className: "!bg-amber-50 !border-gray-200 !text-black",
-    onClick: handleComingSoonPopup,
-  },
-  {
-    icon: <ShareIcon size={30} duration={1.05} color="black" />,
-    label: "Share the page",
-    className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick:  handleComingSoonPopup,
-  },
-  {
-    icon: <HouseIcon size={30} duration={1.05} color="black" />,
-    label: "Go to Home",
-    className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick: handleComingSoonPopup,
-  },
-  {
-    icon: <PlayIcon size={30} duration={1.05} color="black" />,
-    label: "Go to Home",
-    className: "!bg-green-50  !border-gray-200 !text-black",
-    onClick:  handleComingSoonPopup,
-  },
+      icon: <TiArrowLeftThick />,
+      label: " Previous Page",
+      className: "!bg-green-200  !border-gray-200 !text-black",
+      onClick: handlePrev,
+    },
+    {
+      icon: <StarIcon size={30} duration={1.05} color="black" />,
+      label: "Star the page",
+      className: "!bg-amber-50 !border-gray-200 !text-black",
+      onClick: handleComingSoonPopup,
+    },
+    {
+      icon: <ShareIcon size={30} duration={1.05} color="black" />,
+      label: "Share the page",
+      className: "!bg-green-50  !border-gray-200 !text-black",
+      onClick: handleComingSoonPopup,
+    },
+    {
+      icon: <HouseIcon size={30} duration={1.05} color="black" />,
+      label: "Go to Home",
+      className: "!bg-green-50  !border-gray-200 !text-black",
+      onClick: () => router.push("/"),
+    },
+    {
+      icon: <PlayIcon size={30} duration={1.05} color="black" />,
+      label: "Start as slideshow",
+      className: "!bg-green-50  !border-gray-200 !text-black",
+      onClick: handleComingSoonPopup,
+    },
 
-  {
-    icon: <ImFontSize />,
-    label: "Change Font Size",
-    className: "!bg-blue-100  !border-gray-200 !text-black",
-    onClick:  handleComingSoonPopup,
-  },
+    {
+      icon: <ImFontSize />,
+      label: "Change Font Size",
+      className: "!bg-blue-100  !border-gray-200 !text-black",
+      onClick: handleComingSoonPopup,
+    },
 
-  {
-    icon: <TiArrowRightThick />,
-    label: "Next Page",
-    className: "!bg-green-200  !border-gray-200 !text-black",
-    onClick:handleNext,
-  },
-];
-
-
-
-
+    {
+      icon: <TiArrowRightThick />,
+      label: "Next Page",
+      className: "!bg-green-200  !border-gray-200 !text-black",
+      onClick: handleNext,
+    },
+  ];
 
   const doc = props.data;
   const pages = doc.pages;
   const [index, setIndex] = useState(0);
   const page = pages[index];
-  const [showNavigation,setShowNavigation] = useState(false);
+  const [showNavigation, setShowNavigation] = useState(false);
   const handleNavigationToggle = () => {
     setShowNavigation((prev) => !prev);
   };
-
 
   return (
     <div
@@ -206,8 +200,11 @@ export default function Page(props: {
     >
       <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
 
-       <ComingSoonDialog open={comingSoonOpen} onOpenChange={handleComingSoonPopup}/>
-      
+      <ComingSoonDialog
+        open={comingSoonOpen}
+        onOpenChange={handleComingSoonPopup}
+      />
+
       <div className="absolute bottom-0 w-full flex justify-center z-50 pointer-events-none">
         <div className="pointer-events-auto">
           <Dock className="bg-blue-200" items={items}></Dock>
@@ -217,11 +214,13 @@ export default function Page(props: {
   );
 }
 
-export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:()=>void}) {
+export function PageContent(props: {
+  page: PageData;
+  onNext: () => void;
+  onPrev: () => void;
+}) {
   const page = props.page;
   const router = useRouter();
-
-
 
   if (!page) return null;
 
@@ -236,16 +235,12 @@ export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:
             animate="visible"
             className={` md:w-[50vw] font-playwrite rounded-2xl mb-30  dark:bg-black w-[90vw] h-[90vh] flex flex-row flex-wrap  justify-center items-center px-6 my-10 `}
           >
-          <TextRenderer
-            onAnimationComplete={() => {}}
-            text={page.text || ""}
-            index={0}
-          ></TextRenderer>
+            <TextRenderer
+              onAnimationComplete={() => {}}
+              text={page.text || ""}
+              index={0}
+            ></TextRenderer>
           </motion.div>
-
-
-       
-
         </motion.div>
       );
 
@@ -274,8 +269,6 @@ export function PageContent(props: { page: PageData; onNext: () => void ;onPrev:
               <p className="px-4 text-center truncate">{link.text}</p>
             </motion.div>
           ))}
-      
-         
         </motion.div>
       );
 
@@ -321,8 +314,6 @@ export function PageContent1(props: {
               </motion.p>
             ))}
           </div>
-
-      
         </motion.div>
       );
 
@@ -351,7 +342,6 @@ export function PageContent1(props: {
               <p className="px-4 text-center truncate">{link.text}</p>
             </motion.div>
           ))}
-        
         </motion.div>
       );
 
@@ -389,7 +379,9 @@ function TextWithMedia(props: {
 
   const handlePrevSlide = () => {
     if (page.media) {
-      setSlideIndex((prev) => (prev - 1 + page.media!.length) % page.media!.length);
+      setSlideIndex(
+        (prev) => (prev - 1 + page.media!.length) % page.media!.length,
+      );
     }
   };
 
@@ -405,16 +397,18 @@ function TextWithMedia(props: {
               onClick={handlePrevSlide}
               className="absolute left-2 md:left-8 z-10 p-2 md:p-3 bg-blue-100 text-black rounded-full hover:bg-blue-300 transition-colors shadow-lg cursor-pointer"
             >
-              <TiArrowLeftThick size={24} className="md:w-10 md:h-10"/>
+              <TiArrowLeftThick size={24} className="md:w-10 md:h-10" />
             </button>
 
             <AnimatePresence mode="wait">
               <motion.div
                 key={slideIndex}
-                initial={{ opacity: 0, y: 100, scale: 0.9 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -100, scale: 0.9 }}
-                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, y: -10, scale: 0.9 }}
+                transition={{
+                  duration: 0.1,
+                }}
                 onMouseEnter={handleImageHoverStart}
                 onMouseLeave={handleImageHoverEnd}
                 className="w-full h-full flex justify-center items-center"
@@ -434,7 +428,7 @@ function TextWithMedia(props: {
               onClick={handleNextSlide}
               className="absolute right-2 md:right-8 z-10 p-2 md:p-3 bg-blue-100 text-black rounded-full hover:bg-blue-300 transition-colors shadow-lg cursor-pointer"
             >
-              <TiArrowRightThick size={24} className="md:w-10 md:h-10"/>
+              <TiArrowRightThick size={24} className="md:w-10 md:h-10" />
             </button>
           </>
         )}
@@ -453,14 +447,20 @@ function TextWithMedia(props: {
           <motion.div
             initial={{ opacity: 0, y: 50, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
-            exit={{ opacity: 0, y: 50, x: "-50%", transition: { duration: 0.3 } }}
+            exit={{
+              opacity: 0,
+              y: 50,
+              x: "-50%",
+              transition: { duration: 0.3 },
+            }}
             className="absolute left-1/4 bottom-20 z-20 h-auto bg-green-200 shadow-2xl rounded-xl p-4 w-[400px] flex flex-col justify-center items-center text-black pointer-events-none"
           >
-            <p className="text-2xl text-center">{page.media[currImage].description}</p>
+            <p className="text-2xl text-center">
+              {page.media[currImage].description}
+            </p>
           </motion.div>
         )}
       </AnimatePresence>
-     
     </motion.div>
   );
 }
@@ -485,7 +485,7 @@ export function TextRenderer(props: {
         {props.text.split(" ").map((word, index) => (
           <motion.p
             variants={wordVariants}
-            className={`${props.height ? `h-${props.height}` : ''} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
+            className={`${props.height ? `h-${props.height}` : ""} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
             key={`${props.index}-${index}`}
           >
             {word}
