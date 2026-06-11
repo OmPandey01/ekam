@@ -8,6 +8,8 @@
 //  it should be organized in a clear and logical manner, making it easy for readers to follow along
 // and understand the key points being presented.
 
+import { title } from "motion/react-client";
+
 export enum PageType {
   Text = "text",
   Links = "links",
@@ -162,12 +164,97 @@ export const human_evolution: Document = {
     },
   ],
 };
+export const human_evolution1: Document = {
+  id: "human_evolution_2",
+  title: "Let's Explore Human Evolution Again",
+  thumbnailUrl:
+    "https://cdn.pixabay.com/photo/2019/04/10/03/38/kid-4116127_1280.jpg",
+  author: "Om Pandey",
+  date: "12-05-2026",
+  stats: { likes: "223", repost: "12", upvote: "122" },
+  pages: [
+    {
+      pageId: "human_evolution_page_1",
+      type: PageType.Text,
+      text: "Om you are re-reading the same thing human evolution, the process by which human beings developed on Earth from now-extinct primates.",
+    },
+    {
+      pageId: "human_evolution_page_2",
+      type: PageType.TextWithMedia,
+      text: " we humans are Homo sapiens, a culture-bearing upright-walking species that lives on the ground and very likely first evolved in Africa about 315,000 years ago.",
+      media: [
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2024/10/02/18/32/ai-generated-9091918_1280.jpg",
+          description: "Image of a Homosepien",
+          height: 200,
+          width: 400,
+        },
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2016/09/16/21/19/death-1675157_1280.jpg",
+          description: "Remains of a Human Head",
+          height: 200,
+          width: 400,
+        },
+      ],
+    },
+    {
+      pageId: "human_evolution_page_3",
+      type: PageType.Text,
+      text: "We are now the only living members of what many zoologists refer to as the human tribe, Hominini,",
+    },
+    {
+      pageId: "human_evolution_page_4",
+      type: PageType.Text,
+      text: "but there is abundant fossil evidence to indicate that we were preceded for millions of years by other hominins, such as Ardipithecus, Australopithecus, and other species of Homo, and that our species also lived for a time contemporaneously with at least one other member of our genus, H. neanderthalensis (the Neanderthals). ",
+    },
+    {
+      pageId: "human_evolution_page_5",
+      type: PageType.TextWithMedia,
+      text: " In addition, we and our predecessors have always shared Earth with other apelike primates, from the modern-day gorilla to the long-extinct Dryopithecus.",
+      media: [
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2023/06/21/08/58/monkey-8078840_1280.jpg",
+          description: "Priamate",
+        },
+        {
+          type: "image",
+          url: "https://cdn.pixabay.com/photo/2017/04/02/06/21/monkey-2195107_1280.jpg",
+          description: "Priamate",
+        },
+      ],
+    },
+    {
+      pageId: "human_evolution_page_6",
+      type: PageType.Text,
+      text: "Darwin never claimed, as some of his Victorian contemporaries insisted he had, that “man was descended from the apes,” and modern scientists would view such a statement as a useless simplification—just as they would dismiss any popular notions that a certain extinct species is the “missing link” between humans and the apes. ",
+    },
+    {
+      pageId: "human_evolution_page_7",
+      type: PageType.Text,
+      text: 'There is theoretically, however, a common ancestor that existed millions of years ago. This ancestral species does not constitute a "missing link" along a lineage but rather a node for divergence into separate lineages.',
+    },
+    {
+      pageId: "human_evolution_page_8",
+      type: PageType.Text,
+      text: 'There is theoretically, however, a common ancestor that existed millions of years ago. This ancestral species does not constitute a "missing link" along a lineage but rather a node for divergence into separate lineages.',
+    },
+    {
+      pageId: "human_evolution_page_9",
+      type: PageType.Text,
+      text: "This ancient primate has not been identified and may never be known with certainty, because fossil relationships are unclear even within the human lineage, which is more recent. In fact, the human “family tree” may be better described as a “family bush,” within which it is impossible to connect a full chronological series of species, leading to Homo sapiens, that experts can agree upon.",
+    },
+  ],
+};
 
 export const doc1 = human_evolution;
 // Initial Mock data
 
 export const doc12 = {
   id: "doc_climate_change_india",
+  title: "Climate Change in India",
   pages: [
     {
       pageId: "climate_page_1",
@@ -444,3 +531,5 @@ export const doc13 = {
     },
   ],
 };
+
+export const collection: Document[] = [doc1, human_evolution1];

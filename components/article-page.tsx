@@ -114,7 +114,7 @@ const imageVariant = {
 };
 
 export default function Page(props: {
-  data: DocData;
+  data: Document;
   title?: string;
   index?: number;
   onNext?: () => void;
@@ -122,6 +122,11 @@ export default function Page(props: {
   text?: string;
 }) {
   const router = useRouter();
+
+  const data = props.data;
+  const pages = data.pages;
+
+  const [index, setIndex] = useState(props.index ?? 0);
 
   const handleNext = () => {
     const nextIndex = (index + 1) % pages.length;
@@ -184,10 +189,6 @@ export default function Page(props: {
       onClick: handleNext,
     },
   ];
-
-  const doc = props.data;
-  const pages = doc.pages;
-  const [index, setIndex] = useState(0);
   const page = pages[index];
   const [showNavigation, setShowNavigation] = useState(false);
   const handleNavigationToggle = () => {

@@ -3,11 +3,16 @@ import Image from "next/image";
 import { BiRepost } from "react-icons/bi";
 import { AiFillLike } from "react-icons/ai";
 import { PiHandsClapping } from "react-icons/pi";
+import { useRouter } from "next/navigation";
 
 const ArticleCard = ({ document }: { document: Document }) => {
+  const router = useRouter();
   return (
-    <div className="flex flex-row w-full h-40 justify-between bg-white  shadow-lg ">
-      <div className="p-2 flex flex-col justify-between">
+    <div
+      onClick={() => router.push(`article/${document.id}`)}
+      className="flex flex-row w-full  h-40 justify-between bg-white my-12  "
+    >
+      <div className="p-2 flex flex-col justify-between ">
         <div className="flex flex-row items-center">
           <div className="h-5 w-5 rounded-full bg-blue-500"></div>
           <h2 className="mt-2 m-2 text-gray-400">
