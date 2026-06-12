@@ -176,7 +176,7 @@ export const human_evolution1: Document = {
     {
       pageId: "human_evolution_page_1",
       type: PageType.Text,
-      text: "Om you are re-reading the same thing human evolution, the process by which human beings developed on Earth from now-extinct primates.",
+      text: `   Om you are re-reading the same thing human evolution, the process by which human beings developed on Earth from now-extinct primates.`,
     },
     {
       pageId: "human_evolution_page_2",
