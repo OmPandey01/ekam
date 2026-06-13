@@ -1,3 +1,11 @@
+
+## Progress Update
+Uptill this point almost everything is working fine from Auth, Database so a majour chunk og work is done , but Text Renderer is very simple. It can't apply any styling to individual text elements like Bold, Higlighting color etc.
+
+So later this week I'll design the Text Renderer from the ground up. I am thinking of adding Markdown support and other advanced text formatting features. will Update here.
+
+One more thing, I still love writing core logic manually, but doing all the UI styling myself will take months. To speed things up, I'm bringing in AI-assisted dev tools and MCP tools to handle the repetitive styling. I'll also be teaming up with a friend who is amazing at design and colors to make sure the UI is not boring as me 😅 , while I focus on the heavy lifting and adding important features bcs you see it is taking lot of time things are working fine here and then all of sudden something seems off there now'll i'll be fixing that instead of working on new features.
+
 ### Confusion choosing database
 
 Look the problem is that a document(collection of pages) could grow very large and i am using PostgreSQL for this project and i'll have to send complete Json documents between the client and the server each time user makes changes to the document. even if they add a single character, the entire document needs to be sent.

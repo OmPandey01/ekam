@@ -22,7 +22,6 @@ const navItems = [
   { title: "Explore", url: "/explore", icon: FiCompass },
   { title: "Library", url: "/library", icon: FiBook },
   { title: "Profile", url: "/profile", icon: FiUser },
-  { title: "Settings", url: "/settings", icon: FiSettings },
 ];
 
 export function AppSidebar() {

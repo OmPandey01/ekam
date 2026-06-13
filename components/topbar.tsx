@@ -1,10 +1,68 @@
+"use client";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FiSearch, FiEdit3 } from "react-icons/fi";
+import { FiSearch, FiX, FiEdit3, FiLogOut, FiBookmark } from "react-icons/fi";
+import { useState } from "react";
+import { motion } from "framer-motion";
+import useAuthStore from "@/data/authStore";
+import { useRouter } from "next/navigation";
+
+function ProfileOptions(props: any) {
+  const router = useRouter();
+  const logout = useAuthStore((state) => state.logout);
+  let isVisible = props.isVisible;
+  const ProfileOptionsItems = [
+    {
+      label: "Edit Profile",
+      icon: <FiEdit3 />,
+      action: () => router.push("/profile"),
+    },
+    {
+      label: "Bookmarks",
+      icon: <FiBookmark />,
+      action: () => router.push("/library"),
+    },
+    {
+      label: "log out",
+      icon: <FiLogOut />,
+      action: () => {
+        logout();
+        window.location.reload();
+      },
+    },
+    {
+      label: "Close Popup",
+      icon: <FiX />,
+      action: () => {
+        props.setShowProfileOptions(false);
+      },
+    },
+  ];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: isVisible ? 1 : 0, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className={` flex items-center flex-col absolute top-13 right-10 rounded-2xl bg-gray-100 shadow-2xl ${isVisible ? "visible" : "hidden"} h-auto p-5 w-60 flex  justify-center items-center`}
+    >
+      {ProfileOptionsItems.map((option, index) => (
+        <div
+          key={index}
+          onClick={option.action}
+          className="hover:bg-gray-200 w-full h-10 p-2 rounded-[5px] m-2 mx-2 rounded-1xl  flex items-center gap-2"
+        >
+          {option.icon}
+          <span>{option.label}</span>
+        </div>
+      ))}
+    </motion.div>
+  );
+}
 
 export default function Topbar() {
+  const [showProfileOptions, setShowProfileOptions] = useState(false);
   return (
     <header className="sticky top-0 z-50 flex h-auto p-1 w-full items-center justify-between border-b bg-white px-4 shadow-sm md:px-6">
       {/* LEFT SIDE: Sidebar Toggle & Search */}
@@ -40,12 +98,21 @@ export default function Topbar() {
         </Button>
 
         {/* User Profile Avatar */}
-        <Avatar className="h-8 w-8 cursor-pointer ring-2 ring-transparent transition-all hover:ring-gray-200">
+        <Avatar
+          onMouseDown={() =>
+            setShowProfileOptions(showProfileOptions ? false : true)
+          }
+          className="h-8 w-8 cursor-pointer ring-2 ring-transparent transition-all hover:ring-gray-200"
+        >
           <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
           <AvatarFallback className="bg-gray-800 text-white text-xs">
             US
           </AvatarFallback>
         </Avatar>
+        <ProfileOptions
+          setShowProfileOptions={setShowProfileOptions}
+          isVisible={showProfileOptions}
+        />
       </div>
     </header>
   );

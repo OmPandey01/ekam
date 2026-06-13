@@ -533,3 +533,12 @@ export const doc13 = {
 };
 
 export const collection: Document[] = [doc1, human_evolution1];
+
+export const whyEkam = [
+  "Long articles feel heavy. Most people skim, not read.",
+  "We add subtle motion so your eyes don't get lost.",
+  "No dancing graphics. Just gentle, purposeful movement.",
+  "You finish what you start. That's the real metric.",
+  "Built for deep reading, not addictive scrolling.",
+  "Ekam helps you stay in flow, not fight for it.",
+];

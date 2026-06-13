@@ -83,6 +83,14 @@ const containerVariants = {
       duration: 0.9,
     },
   },
+  exit: {
+    opacity: 0,
+    transition: {
+      staggerChildren: 0.05,
+      staggerDirection: -1, // Optional: Makes words exit in reverse order!
+      when: "afterChildren", // Waits for all words to fade out before destroying container
+    },
+  },
 };
 
 const wordVariants = {
@@ -93,6 +101,11 @@ const wordVariants = {
     scale: 1,
     y: 0,
     transition: { type: "spring" as const, stiffness: 200, damping: 15 },
+  },
+  exit: {
+    opacity: 0,
+    y: -20, // Slides upwards slightly as it fades away
+    transition: { duration: 0.2 },
   },
 };
 
@@ -473,26 +486,73 @@ export function TextRenderer(props: {
   size?: "sm" | "md" | "lg";
   height?: number;
 }) {
+  console.log("Got the text : ", props.text);
+
+  const uniqueKey = props.index !== undefined ? props.index : props.text;
+
   return (
-    <motion.div
-      key={props.index}
-      variants={containerVariants}
-      initial="hidden"
-      animate="visible"
-      onAnimationComplete={props.onAnimationComplete}
-      className={` ${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
-    >
-      <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
-        {props.text.split(" ").map((word, index) => (
-          <motion.p
-            variants={wordVariants}
-            className={`${props.height ? `h-${props.height}` : ""} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
-            key={`${props.index}-${index}`}
-          >
-            {word}
-          </motion.p>
-        ))}
-      </div>
-    </motion.div>
+    /* 1. Wrap your animating elements in AnimatePresence */
+    /* mode="wait" ensures old text completely exits before new text enters */
+    <AnimatePresence mode="wait">
+      <motion.div
+        key={uniqueKey}
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+        exit="exit" // 2. Tell Framer Motion to look for the "exit" variant
+        onAnimationComplete={props.onAnimationComplete}
+        className={`${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
+      >
+        <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
+          {props.text.split(" ").map((word, index) => (
+            <motion.p
+              variants={wordVariants}
+              style={props.height ? { height: `${props.height}px` } : {}}
+              className={`text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${
+                props.size === "sm"
+                  ? "text-sm"
+                  : props.size === "md"
+                    ? "text-md"
+                    : "text-lg"
+              }`}
+              key={`${uniqueKey}-${index}`}
+            >
+              {word}
+            </motion.p>
+          ))}
+        </div>
+      </motion.div>
+    </AnimatePresence>
   );
 }
+// export function TextRenderer(props: {
+//   text: string;
+//   index?: number;
+//   onAnimationComplete?: () => void;
+//   size?: "sm" | "md" | "lg";
+//   height?: number;
+// }) {
+//   console.log("GOt the text : ", props.text);
+//   return (
+//     <motion.div
+//       key={props.index}
+//       variants={containerVariants}
+//       initial="hidden"
+//       animate="visible"
+//       onAnimationComplete={props.onAnimationComplete}
+//       className={` ${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
+//     >
+//       <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
+//         {props.text.split(" ").map((word, index) => (
+//           <motion.p
+//             variants={wordVariants}
+//             className={`${props.height ? `h-${props.height}` : ""} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
+//             key={`${props.index}-${index}`}
+//           >
+//             {word}
+//           </motion.p>
+//         ))}
+//       </div>
+//     </motion.div>
+//   );
+// }
