@@ -30,7 +30,7 @@ export function AppSidebar() {
   }, []);
 
   // Visibility: on mobile always visible, on desktop controlled by toggle button (isOpen)
-  const shouldShow = isMobile ? isOpen : isOpen;
+  const shouldShow = isMobile ? isOpen : true;
 
   // Expansion: on mobile always expanded (200px), on desktop expand on hover
   const shouldExpand = isMobile ? true : isExpanded;

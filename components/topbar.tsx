@@ -79,7 +79,7 @@ export default function Topbar() {
         <Button
           variant="ghost"
           onClick={toggle}
-          className="text-gray-600 hover:text-gray-900 h-10 w-10 bg-gray-200"
+          className="text-gray-600 md:hidden hover:text-gray-900 h-10 w-10 bg-gray-200"
         >
           {isOpen ? (
             <TbLayoutSidebarRightExpandFilled size={30} scale={30} />
