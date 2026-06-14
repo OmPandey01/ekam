@@ -2,6 +2,8 @@
 import { useState } from "react";
 import Source from "./source";
 import NextButton from "@/components/page-turn-button";
+import { CoreDocument, Media, BasePage } from "@/data/data";
+import { Page as PageType } from "@/data/data";
 
 import { AnimatePresence, motion } from "motion/react";
 import { Coiny } from "next/font/google";
@@ -44,6 +46,7 @@ export interface PageData {
   pageId: string;
   type: string;
   text?: string;
+
   media?: MediaItem[];
   links?: LinkItem[];
 }
@@ -127,7 +130,7 @@ const imageVariant = {
 };
 
 export default function Page(props: {
-  data: Document;
+  data: CoreDocument;
   title?: string;
   index?: number;
   onNext?: () => void;
@@ -229,7 +232,7 @@ export default function Page(props: {
 }
 
 export function PageContent(props: {
-  page: PageData;
+  page: PageType;
   onNext: () => void;
   onPrev: () => void;
 }) {
@@ -280,80 +283,7 @@ export function PageContent(props: {
               onClick={() => router.push(link.url)}
               key={`${page.pageId}-${index}`}
             >
-              <p className="px-4 text-center truncate">{link.text}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      );
-
-    case "text-with-media":
-      return <TextWithMedia data={page} onNext={props.onNext}></TextWithMedia>;
-
-    default:
-      return <p>{"Got Error" + page.type}</p>;
-  }
-}
-
-export function PageContent1(props: {
-  page: PageData;
-  index?: number;
-  onNext: () => void;
-}) {
-  const page = props.page;
-  const router = useRouter();
-
-  if (!page) return null;
-
-  switch (page.type) {
-    case "text":
-      return (
-        <motion.div
-          key={props.index}
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-          transition={{ duration: 100 }}
-          className={`${coiny.className} bg-yellow-50 w-screen h-screen flex flex-col justify-center items-center px-6 md:px-0`}
-        >
-          <div className="  flex flex-row flex-wrap justify-center content-center gap-y-2 ">
-            {(page.text || "").split(" ").map((word, index) => (
-              <motion.p
-                variants={wordVariants}
-                initial="hidden"
-                animate="visible"
-                className="text-3xl md:text-4xl mx-1 my-0.5"
-                key={`${page.pageId}-${index * 32}`}
-              >
-                {word}
-              </motion.p>
-            ))}
-          </div>
-        </motion.div>
-      );
-
-    case "links":
-      return (
-        <motion.div
-          key={page.pageId}
-          className={` bg-blue-50 w-screen h-screen flex flex-col justify-center items-center px-4`}
-        >
-          {page.links?.map((link, index) => (
-            <motion.div
-              className="h-12 w-full max-w-xs rounded-3xl bg-blue-200 m-4 flex justify-center items-center cursor-pointer"
-              whileHover={{ scale: 1.5, backgroundColor: "lightBlue" }}
-              initial={{ scale: 0 }}
-              animate={{
-                scale: 1,
-                transition: {
-                  type: "spring" as const,
-                  stiffness: 100,
-                  damping: 8,
-                },
-              }}
-              onClick={() => router.push(link.url)}
-              key={`${page.pageId}-${index}`}
-            >
-              <p className="px-4 text-center truncate">{link.text}</p>
+              <p className="px-4 text-center truncate">{link.description}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -368,7 +298,7 @@ export function PageContent1(props: {
 }
 
 function TextWithMedia(props: {
-  data: PageData;
+  data: BasePage & { type: "text-with-media" } & { media: Media[] };
   onNext: () => void;
   index?: number;
 }) {

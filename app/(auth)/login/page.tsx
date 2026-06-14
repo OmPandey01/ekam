@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -48,7 +48,7 @@ const features = [
 ];
 
 // Animation variants
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -59,7 +59,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
@@ -68,7 +68,7 @@ const itemVariants = {
   },
 };
 
-const slideInLeft = {
+const slideInLeft: Variants = {
   hidden: { x: -60, opacity: 0 },
   visible: {
     x: 0,
@@ -77,7 +77,7 @@ const slideInLeft = {
   },
 };
 
-const slideInRight = {
+const slideInRight: Variants = {
   hidden: { x: 60, opacity: 0 },
   visible: {
     x: 0,
@@ -228,15 +228,9 @@ export default function LoginPage() {
     if (result && result.success) {
       // Redirect to home on success
       router.push("/");
-    } else if (result && result.needsVerification) {
-      // Redirect to verification page if needed
-      setCredentialsError("Please verify your email before logging in.");
-      setTimeout(() => {
-        router.push(`/verification/${result.userId}`);
-      }, 1500);
     } else {
       // Show error message
-      setCredentialsError(result?.error || "Invalid email or password");
+      setCredentialsError(result?.data.error || "Invalid email or password");
     }
   };
 

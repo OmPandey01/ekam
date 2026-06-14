@@ -2,7 +2,7 @@
 // I am making this platform specifically to make reading more engaging and interactive for everyone.
 // So the content should be concise, engaging and informative.
 //  It should be written in a way that captures the reader's attention and keeps them interested
-// throughout the document.
+// throughout the CoreDocument.
 //  The content should also be well-researched and accurate,
 //  providing valuable information to the reader. Additionally,
 //  it should be organized in a clear and logical manner, making it easy for readers to follow along
@@ -27,7 +27,7 @@ export enum PageType {
   TextWithMedia = "text-with-media",
 }
 
-type Media = {
+export type Media = {
   type: "image";
   url: string;
   description: string;
@@ -48,7 +48,7 @@ type PageStyle = {
   backgroundImage?: string;
 };
 
-type BasePage = {
+export type BasePage = {
   pageId: string;
   text: string;
 };
@@ -69,7 +69,7 @@ export type Page = BasePage &
   ) &
   PageStyle;
 
-export type Document = {
+export type CoreDocument = {
   id: string;
   title: string;
   thumbnailUrl?: string;
@@ -187,7 +187,7 @@ const baba_bulleshah = {
   ],
 };
 
-export const human_evolution: Document = {
+export const human_evolution: CoreDocument = {
   id: "human_evolution_1",
   title: "Let's Explore Human Evolution",
   thumbnailUrl:
@@ -271,7 +271,7 @@ export const human_evolution: Document = {
     },
   ],
 };
-export const human_evolution1: Document = {
+export const human_evolution1: CoreDocument = {
   id: "human_evolution_2",
   title: "Let's Explore Human Evolution Again",
   thumbnailUrl:
@@ -639,7 +639,7 @@ export const doc13 = {
   ],
 };
 
-export const collection: Document[] = [baba_bulleshah, doc1, human_evolution1];
+export const collection: CoreDocument[] = [doc1, human_evolution1];
 
 export const whyEkam = [
   "Long articles feel heavy. Most people skim, not read.",

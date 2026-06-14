@@ -14,7 +14,7 @@ export const PublicRoute = ({ children }: PublicRouteProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    if (!isLoading && isAuthenticated) {
+    if (!isLoading && isAuthenticated()) {
       router.push("/dashboard");
     }
   }, [isAuthenticated, isLoading, router]);
@@ -23,7 +23,7 @@ export const PublicRoute = ({ children }: PublicRouteProps) => {
     return <div>Loading...</div>;
   }
 
-  if (isAuthenticated) {
+  if (isAuthenticated()) {
     return null;
   }
 

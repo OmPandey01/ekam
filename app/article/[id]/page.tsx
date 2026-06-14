@@ -2,7 +2,7 @@ import Page from "@/components/article-page";
 
 import { collection } from "@/data/data";
 
-import { doc1 } from "@/data/data";
+import { doc1, CoreDocument } from "@/data/data";
 
 export enum PageType {
   Text = "text",

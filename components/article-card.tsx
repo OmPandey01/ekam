@@ -1,11 +1,11 @@
-import { Document } from "../data/data";
+import { CoreDocument } from "../data/data";
 import Image from "next/image";
 import { BiRepost } from "react-icons/bi";
 import { AiFillLike } from "react-icons/ai";
 import { PiHandsClapping } from "react-icons/pi";
 import { useRouter } from "next/navigation";
 
-const ArticleCard = ({ document }: { document: Document }) => {
+const ArticleCard = ({ document }: { document: CoreDocument }) => {
   const router = useRouter();
   return (
     <div

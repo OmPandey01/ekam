@@ -1,5 +1,5 @@
 "use client";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { TextRenderer } from "@/components/article-page";
 import { BookOpen, Sparkles, Zap, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
@@ -24,7 +24,7 @@ const features = [
   },
 ];
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -35,7 +35,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 12, opacity: 0 },
   visible: {
     y: 0,
@@ -44,7 +44,7 @@ const itemVariants = {
   },
 };
 
-const slideInLeft = {
+const slideInLeft: Variants = {
   hidden: { x: -40, opacity: 0 },
   visible: {
     x: 0,

@@ -7,7 +7,11 @@ import ClientLayout from "@/components/layout/client-layout";
 // ... font definitions ...
 
 // app/(dashboard)/layout.tsx
-export default function DashboardLayout({ children }) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     // No <html> or <body> here!
     <ClientLayout>{children}</ClientLayout>

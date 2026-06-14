@@ -1,9 +1,11 @@
 "use client";
-import api from "@/api-contollers/api";
+import api from "@/api-controllers/api";
 import { useEffect, useState } from "react";
 
 export default function ProfilePage() {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<null | { name: string; email: string }>(
+    null,
+  );
   useEffect(() => {
     const fetchUser = async () => {
       const response = await api.get("auth/me", {

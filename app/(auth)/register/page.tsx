@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import SideInfoGraphics from "@/components/Side_Infographics";
 import { whyEkam } from "@/data/data";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
@@ -60,7 +60,7 @@ const features = [
 ];
 
 // Animation variants (reused)
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -71,7 +71,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
@@ -80,7 +80,7 @@ const itemVariants = {
   },
 };
 
-const slideInLeft = {
+const slideInLeft: Variants = {
   hidden: { x: -60, opacity: 0 },
   visible: {
     x: 0,
@@ -89,7 +89,7 @@ const slideInLeft = {
   },
 };
 
-const slideInRight = {
+const slideInRight: Variants = {
   hidden: { x: 60, opacity: 0 },
   visible: {
     x: 0,
@@ -154,11 +154,13 @@ export default function SignupPage() {
 
     try {
       const result = await register({ name, email, password });
+      router.push(`/verification/${result.data.userId}`);
 
-      if (result.needsVerification) {
-        router.push(`/verification/${result.userId}`);
-      } else {
+      if (result.success) {
+        router.push(`/verification/${result.data.userId}`);
         setSuccessStep("success");
+      } else {
+        setError(result.data.error || "An unexpected error occurred");
       }
     } catch (error: any) {
       setError(error.message || "An unexpected error occurred");

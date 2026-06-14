@@ -3,7 +3,7 @@ import SideInfoGraphics from "@/components/Side_Infographics";
 import { whyEkam } from "@/data/data";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -51,7 +51,7 @@ const features = [
 ];
 
 // Animation variants (same as before)
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -62,7 +62,7 @@ const containerVariants = {
   },
 };
 
-const itemVariants = {
+const itemVariants: Variants = {
   hidden: { y: 20, opacity: 0 },
   visible: {
     y: 0,
@@ -71,7 +71,7 @@ const itemVariants = {
   },
 };
 
-const slideInLeft = {
+const slideInLeft: Variants = {
   hidden: { x: -60, opacity: 0 },
   visible: {
     x: 0,
@@ -80,7 +80,7 @@ const slideInLeft = {
   },
 };
 
-const slideInRight = {
+const slideInRight: Variants = {
   hidden: { x: 60, opacity: 0 },
   visible: {
     x: 0,

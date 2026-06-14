@@ -1,7 +1,40 @@
-import api from "@/api-contollers/api"; // Fixed typo: api-contollers -> api-controllers
+import api from "@/api-controllers/api";
 import { create } from "zustand";
 
-const useAuthStore = create((set, get) => ({
+interface AuthType {
+  user: any | null;
+  isLoading: boolean;
+  error: string | null;
+  verifyOtp: ({
+    userId,
+    otp,
+  }: {
+    userId: string;
+    otp: string;
+  }) => Promise<{ success: boolean; data: any; user: any }>;
+  register: ({
+    email,
+    password,
+    name,
+  }: {
+    email: string;
+    password: string;
+    name: string;
+  }) => Promise<{ success: boolean; data: any; user: any }>;
+  login: ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => Promise<{ success: boolean; data: any; user: any | null }>;
+  logout: () => void;
+  isAuthenticated: () => boolean;
+  clearError: () => void;
+  checkAuth: () => Promise<boolean>;
+}
+
+const useAuthStore = create<AuthType>((set, get) => ({
   user: null,
   isLoading: false,
   error: null,
@@ -12,21 +45,18 @@ const useAuthStore = create((set, get) => ({
     try {
       const response = await api.post("/auth/login", { email, password });
 
-      // Check if response is successful
       if (response.status === 200 || response.status === 201) {
         set({ user: response.data, isLoading: false });
 
         return {
           success: true,
-          data: response.data,
-          user: response.data,
+          data: response.data || " ",
+          user: response.data || "",
         };
       }
 
-      // If we get here, response wasn't successful
       throw new Error("Login failed");
     } catch (error: any) {
-      // Safe error logging
       console.error("Login error details:", {
         message: error?.message,
         response: error?.response?.data,
@@ -34,25 +64,26 @@ const useAuthStore = create((set, get) => ({
         isAxiosError: error?.isAxiosError,
       });
 
-      // Check for verification error
       const needsVerification = error?.response?.data?.isVerified === false;
       const userId = error?.response?.data?.userId;
 
       if (needsVerification) {
+        const errorMsg = "User not verified. Please verify your email.";
         set({
-          error: "User not verified. Please verify your email.",
+          error: errorMsg,
           isLoading: false,
         });
 
         return {
           success: false,
+          data: null,
+          user: null,
           needsVerification: true,
           userId: userId,
-          error: "User not verified",
+          error: errorMsg,
         };
       }
 
-      // Handle other errors
       const errorMessage =
         error?.response?.data?.message || error?.message || "Login failed";
 
@@ -60,6 +91,8 @@ const useAuthStore = create((set, get) => ({
 
       return {
         success: false,
+        data: null,
+        user: null,
         error: errorMessage,
       };
     }
@@ -78,7 +111,6 @@ const useAuthStore = create((set, get) => ({
         },
       );
 
-      // Check if response is successful
       if (response.status === 200 || response.status === 201) {
         set({ isLoading: false });
 
@@ -93,10 +125,8 @@ const useAuthStore = create((set, get) => ({
         };
       }
 
-      // If we get here, response wasn't successful
       throw new Error("Registration failed");
     } catch (error: any) {
-      // Safe error logging
       console.error("Registration error details:", {
         message: error?.message,
         response: error?.response?.data,
@@ -104,52 +134,60 @@ const useAuthStore = create((set, get) => ({
         isAxiosError: error?.isAxiosError,
       });
 
-      // Check for existing user (409 Conflict)
       if (error?.response?.status === 409) {
+        const errorMsg = "User already exists. Please login instead.";
         set({
-          error: "User already exists. Please login instead.",
+          error: errorMsg,
           isLoading: false,
         });
 
         return {
           success: false,
+          data: null,
+          user: null,
           exists: true,
-          error: "User already exists",
+          error: errorMsg,
         };
       }
 
-      // Check for unverified user
       if (error?.response?.data?.isVerified === false) {
+        const errorMsg =
+          "User already exists but not verified. Please verify your email.";
         set({
-          error:
-            "User already exists but not verified. Please verify your email.",
+          error: errorMsg,
           isLoading: false,
         });
 
         return {
           success: false,
+          data: null,
+          user: null,
           needsVerification: true,
           userId: error?.response?.data?.userId,
-          error: "User not verified",
+          error: errorMsg,
         };
       }
 
-      // Handle other errors
-      const errorMessage = {
-        message:
-          error?.response?.data?.message ||
-          error?.message ||
-          "Registration failed",
+      const errorMessage =
+        error?.response?.data?.message ||
+        error?.message ||
+        "Registration failed";
+
+      // Log the full error details for debugging
+      console.error("Full registration error:", {
+        message: errorMessage,
         response: error?.response?.data,
         status: error?.response?.status,
         isAxiosError: error?.isAxiosError,
         needsVerification: error?.response?.data?.isVerified === false,
-      };
+      });
 
       set({ error: errorMessage, isLoading: false });
 
       return {
         success: false,
+        data: null,
+        user: null,
         error: errorMessage,
       };
     }
@@ -167,6 +205,7 @@ const useAuthStore = create((set, get) => ({
         return {
           success: true,
           data: response.data,
+          user: response.data.user || null,
         };
       }
 
@@ -187,6 +226,8 @@ const useAuthStore = create((set, get) => ({
 
       return {
         success: false,
+        data: null,
+        user: null,
         error: errorMessage,
       };
     }
