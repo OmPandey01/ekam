@@ -4,6 +4,7 @@ import { TextRenderer } from "@/components/article-page";
 import { BookOpen, Sparkles, Zap, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import { whyEkam } from "@/data/data";
+import Image from "next/image";
 
 const features = [
   {
@@ -69,7 +70,7 @@ export function TextRendererWithTimer({ data }: { data: string[] }) {
   const textToRender = data && data[idx] ? data[idx] : "";
 
   return (
-    <div className="min-h-[180px]">
+    <div className="min-h-[60vh]">
       <TextRenderer text={textToRender} />
     </div>
   );
@@ -81,13 +82,19 @@ export default function SideInfoGraphics({ data }: { data: string[] }) {
       initial="hidden"
       animate="visible"
       variants={slideInLeft}
-      className="relative hidden lg:flex flex-col bg-yellow-50 dark:bg-neutral-950 border-r border-neutral-200 dark:border-neutral-800 p-10 xl:p-14 overflow-y-auto"
+      className="relative h hidden lg:flex flex-col bg-yellow-50 dark:bg-neutral-950 border-r border-neutral-200 dark:border-neutral-800 p-10 xl:p-14 overflow-y-auto"
     >
-      <div className="relative z-10 flex flex-col h-full gap-12">
+      <div className="relative bg-b z-10 flex flex-col h-full gap-12">
         {/* Brand */}
         <motion.div variants={itemVariants}>
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-full bg-neutral-900 dark:bg-white" />
+            <Image
+              src="/ekam-logo.png"
+              alt="Ekam"
+              width={48}
+              height={24}
+              className="rounded-full"
+            />
             <span className="font-mono text-xs tracking-wider text-neutral-400 uppercase">
               Ekam
             </span>
@@ -100,9 +107,9 @@ export default function SideInfoGraphics({ data }: { data: string[] }) {
             <TextRendererWithTimer data={data} />
           </div>
 
-          <p className="text-neutral-500 dark:text-neutral-400 text-base leading-relaxed max-w-sm">
-            Early access — Ekam is in very early stages, we will be very happy
-            if you could give us some feedback.
+          <p className="text-black font-bold  dark:text-neutral-400 text-base leading-relaxed max-w-sm">
+            Early access — Please Note that Ekam is in very early stages, we
+            will be very happy if you could give us some feedback.
           </p>
         </motion.div>
 

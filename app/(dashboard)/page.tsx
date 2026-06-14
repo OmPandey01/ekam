@@ -16,9 +16,9 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className=" rounded-3xl h-screen w-full flex justify-between items-center p-0"
+        className=" ml-5   h-screen w-screen flex justify-between items-center "
       >
-        <div className="h-screen w-auto bg-white p-2">
+        <div className="  h-screen w-auto  p-2">
           {collection.map((doc, index) => (
             <ArticleCard key={index} document={doc} />
           ))}

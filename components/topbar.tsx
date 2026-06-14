@@ -1,4 +1,8 @@
 "use client";
+import useSidebarStore from "@/data/sideBarStore";
+import { TbLayoutSidebarLeftExpandFilled } from "react-icons/tb";
+import { TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
+
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -13,6 +17,7 @@ function ProfileOptions(props: any) {
   const router = useRouter();
   const logout = useAuthStore((state) => state.logout);
   let isVisible = props.isVisible;
+
   const ProfileOptionsItems = [
     {
       label: "Edit Profile",
@@ -21,7 +26,7 @@ function ProfileOptions(props: any) {
     },
     {
       label: "Bookmarks",
-      icon: <FiBookmark />,
+      icon: <FiBookmark size={40} />,
       action: () => router.push("/library"),
     },
     {
@@ -63,20 +68,40 @@ function ProfileOptions(props: any) {
 
 export default function Topbar() {
   const [showProfileOptions, setShowProfileOptions] = useState(false);
+  const toggle = useSidebarStore((state) => state.toggle);
+  const isOpen = useSidebarStore((state) => state.isOpen);
+
   return (
-    <header className="sticky top-0 z-50 flex h-auto p-1 w-full items-center justify-between border-b bg-white px-4 shadow-sm md:px-6">
+    <header className="sticky top-0 z-50 flex h-[60px] p-1 w-full items-center justify-between border-b bg-white px-4 shadow-sm md:px-6">
       {/* LEFT SIDE: Sidebar Toggle & Search */}
+
+      <div>
+        <Button
+          variant="ghost"
+          onClick={toggle}
+          className="text-gray-600 hover:text-gray-900 h-10 w-10 bg-gray-200"
+        >
+          {isOpen ? (
+            <TbLayoutSidebarRightExpandFilled size={30} scale={30} />
+          ) : (
+            <TbLayoutSidebarLeftExpandFilled size={30} className="h-10 w-5" />
+          )}
+        </Button>
+      </div>
       <div className="flex items-center gap-4">
         {/* This trigger automatically talks to your SidebarProvider */}
-        <SidebarTrigger className="text-gray-600 hover:text-gray-900" />
+        {/*<SidebarTrigger className="text-gray-600 hover:text-gray-900" />*/}
 
         {/* Search Bar - hidden on very small screens, visible on medium+ */}
-        <div className="relative hidden sm:flex items-center">
+        <div className="relative  flex items-center">
           <FiSearch className="absolute left-3 h-4 w-4 text-gray-400" />
-          <Input
+          <motion.input
             type="search"
             placeholder="Search..."
-            className="w-[240px] rounded-full border-none bg-gray-100 pl-9 text-sm focus-visible:ring-1 focus-visible:ring-gray-300 md:w-[300px]"
+            // whileHover={{ scale: 1.2 }}
+            whileFocus={{ scale: 1.2, position: "relative", top: "5" }}
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="  rounded-full  h-10 border-none bg-gray-100 pl-9 text-sm focus-visible:ring-1 focus-visible:ring-gray-300 w-[60vw]"
           />
         </div>
       </div>
@@ -84,9 +109,6 @@ export default function Topbar() {
       {/* RIGHT SIDE: Write & Profile */}
       <div className="flex items-center gap-4 md:gap-6">
         {/* Mobile Search Icon (Shows only when the big search bar is hidden) */}
-        <Button variant="ghost" size="icon" className="sm:hidden text-gray-500">
-          <FiSearch className="h-5 w-5" />
-        </Button>
 
         {/* Write Button (Medium style) */}
         <Button

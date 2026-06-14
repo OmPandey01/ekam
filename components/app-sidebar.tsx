@@ -1,22 +1,10 @@
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupContent,
-  SidebarGroupLabel,
-  SidebarHeader,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from "@/components/ui/sidebar";
+"use client";
+import useSidebarStore from "@/data/sideBarStore";
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { FiHome, FiCompass, FiBook, FiUser } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
-import Image from "next/image";
-
-// Importing icons from react-icons (using Feather icons here as an example)
-import { FiHome, FiCompass, FiBook, FiUser, FiSettings } from "react-icons/fi";
-
-// Define your navigation items in an array for clean rendering
 const navItems = [
   { title: "Home", url: "/", icon: FiHome },
   { title: "Explore", url: "/explore", icon: FiCompass },
@@ -25,59 +13,66 @@ const navItems = [
 ];
 
 export function AppSidebar() {
+  const isOpen = useSidebarStore((state) => state.isOpen);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  const router = useRouter();
+
+  // Detect mobile screen size (no auto-toggling of store)
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  // Visibility: on mobile always visible, on desktop controlled by toggle button (isOpen)
+  const shouldShow = isMobile ? isOpen : isOpen;
+
+  // Expansion: on mobile always expanded (200px), on desktop expand on hover
+  const shouldExpand = isMobile ? true : isExpanded;
+  const sidebarWidth = shouldExpand ? 200 : 50;
+
+  // Disable hover animations on mobile for performance
+  const hoverWidthAnim = isMobile ? {} : { width: 400 };
+  const hoverBgAnim = isMobile ? {} : { backgroundColor: "#0ea5e9" };
+
   return (
-    <Sidebar collapsible="icon" className="bg-white">
-      {/* HEADER: Usually for your App Logo */}
-      <SidebarHeader className="p-4">
-        <div className="flex h-20 items-center gap-3 font-bold text-lg">
-          <Image
-            src="/ekam-logo.png"
-            alt="Ekam"
-            width={50}
-            height={50}
-            className="h-10 w-10 rounded"
-          />
-          <span className=" font-bold text-2xl truncate data-[collapsed=true]:hidden">
-            EKAM
-          </span>
-        </div>
-      </SidebarHeader>
-
-      <SidebarContent>
-        <SidebarGroup>
-          {/* Optional Label (hides when collapsed) */}
-          <SidebarGroupLabel>Main Menu</SidebarGroupLabel>
-
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-
-      {/* FOOTER: Usually for Logout or User Mini-profile */}
-      <SidebarFooter className="p-4">
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild>
-              <a href="/settings" className="flex items-center gap-2">
-                <FiSettings className="h-4 w-4 shrink-0" />
-                <span>Preferences</span>
-              </a>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+    <motion.div
+      initial={{ width: sidebarWidth }}
+      animate={{ width: sidebarWidth }}
+      whileHover={hoverWidthAnim}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+        duration: 0.3,
+      }}
+      style={{ display: shouldShow ? "block" : "none" }}
+      onHoverStart={() => !isMobile && setIsExpanded(true)}
+      onHoverEnd={() => !isMobile && setIsExpanded(false)}
+      className={`shadow-2xs bg-[#FFF6DE] ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
+    >
+      <div className="relative flex flex-col rounded-2xl justify-between items-baseline w-full h-full">
+        {navItems.map((item) => (
+          <motion.button
+            onClick={() => router.push(item.url)}
+            key={item.title}
+            whileHover={hoverBgAnim}
+            className=" p-4 w-full transform-gpu backdrop-blur-md flex h-full items-center justify-center first:rounded-t-xl last:rounded-b-xl"
+          >
+            <div className="flex h-20 min-w-20 w-full justify-center items-center">
+              <item.icon size={25} />
+              <span className={`px-5 ${shouldExpand ? "block" : "hidden"}`}>
+                {item.title}
+              </span>
+            </div>
+          </motion.button>
+        ))}
+      </div>
+    </motion.div>
   );
 }

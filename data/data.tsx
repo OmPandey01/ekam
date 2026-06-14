@@ -10,6 +10,17 @@
 
 import { title } from "motion/react-client";
 
+enum SoundEffect {
+  None = "none",
+  glass = "glass",
+  paper = "paper",
+  typing = "typing",
+  nature = "nature",
+  city = "city",
+  crowd = "crowd",
+  music = "music",
+}
+
 export enum PageType {
   Text = "text",
   Links = "links",
@@ -36,17 +47,6 @@ type PageStyle = {
   backgroundColor?: string;
   backgroundImage?: string;
 };
-
-enum SoundEffect {
-  None = "none",
-  glass = "glass",
-  paper = "paper",
-  typing = "typing",
-  nature = "nature",
-  city = "city",
-  crowd = "crowd",
-  music = "music",
-}
 
 type BasePage = {
   pageId: string;
@@ -78,6 +78,113 @@ export type Document = {
   author?: string;
   date?: string;
   music?: SoundEffect;
+};
+
+const baba_bulleshah = {
+  id: "doc_bulleh_shah_gratitude",
+  title: "बाबा बुल्ले शाह: शुक्र का फकीर | The Sufi Poet of Gratitude",
+  thumbnailUrl: "https://placehold.co/400x300?text=Thumbnail:+Baba+Bulleh+Shah",
+  stats: {
+    likes: "1.2k",
+    repost: "340",
+    upvote: "567",
+  },
+  author: "Sufi Stories by @gratefulheart",
+  date: "2026-06-13",
+  pages: [
+    {
+      pageId: "page_11",
+      type: "text",
+      text: "बाबा बुल्ले शाह वैसे तो वह फकीर थे",
+    },
+    {
+      pageId: "page_1",
+      type: "text",
+      text: '  फकीर शब्द समझते हो? जैसा कबीर साहब ने कहा है: "हद-हद टपे सो औलिया, बेहद टपे सो पीर हद अनहद दोनों टपे, बा को नाम फकीर कबीरा बा को नाम फकीर "',
+    },
+    {
+      pageId: "page_1",
+      type: "text",
+      text: "  अर्थ: जो सीमा (हद) को पार करे वह औलिया है, जो असीम (बेहद) को पार करे वह पीर है लेकिन जो सीमा और असीमता दोनों को पार कर जाए, उसी को फकीर कहते हैं इसलिए फकीरों को औलियाओं और पीरों से भी बड़ा दर्जा दिया गया है",
+    },
+    {
+      pageId: "page_2",
+      type: "text",
+      text: 'एक बार बाबा बुल्ले शाह अपने शागिर्दों के साथ कहीं जा रहे थे एक शागिर्द से रहा नहीं गया उसने पूछ लिया: "बाबा, हम फकीर हैं कई दिन ऐसे गुजरते हैं जब हमें खाना भी नहीं मिलता फिर भी आप हर सुबह-शाम उस खुदा का शुक्रिया अदा करते हैं, जैसे उसने आपको न जाने कितने खजानों से नवाजा हो"',
+    },
+    {
+      pageId: "page_3",
+      type: "text",
+      text: 'बाबा बुल्ले शाह मुस्कुरा दिए उन्होंने शागिर्द से ये पंक्तियाँ कहीं — जो मुझे बहुत पसंद हैं: "चढ़दे सूरज डलदेखे, बुझते दीदे बलदेखे हीरे दा कोई मोल ना जाने, खोटे सिक्के चलदे" (अर्थ: मैंने उगते सूरज को डूबते देखा, जलते दीपक को बुझते देखा हीरे की कीमत कोई नहीं जानता, बस खोटे सिक्के चलते हैं)',
+    },
+    {
+      pageId: "page_4",
+      type: "text",
+      text: '"जिना दाना जगत ते कोई, वो भी पुत्र पलदेखे उसदी रहमत दे नाल, बंदे पानी होते चलदे" (अर्थ: इस दुनिया में जितने भी दाना-समझदार हैं, उन्हें भी मैंने बेटे के रूप में पलते देखा है उस (खुदा) की रहमत के साथ, इंसान पानी की तरह बहता चला जाता है)',
+    },
+    {
+      pageId: "page_5",
+      type: "text",
+      text: '"लोगां दी कह दाल नहीं गलदी, मैं ता पत्थर गलदेखे जिन ने कदर ना कीती रब दी, हथ खाली ओ मलदेखे कई पैर तो नंगे फिरदे, सिरदे लबद छावा मेनु दाता सब कुछ दिता, फिर क्यों ना शुक्र मनावा" (अर्थ: लोगों की बातें दाल की तरह नहीं पकतीं, मैंने तो पत्थर को पिघलते देखा है जिन्होंने रब की कद्र नहीं की, उनके हाथ खाली मलते देखे कई लोग नंगे पैर फिरते हैं, सिर के लिए छाया ढूंढते हैं लेकिन मुझे दाता ने सब कुछ दे दिया — तो मैं शुक्र क्यों न मनाऊँ?)',
+    },
+    {
+      pageId: "page_6",
+      type: "text",
+      text: '"क्यों ना शुक्र मनावा! क्यों ना शुक्र मनावा!" Have that gratitude in you. एक बार उसका शुक्रिया कीजिए जिसने जिंदगी नवाजी है उससे बेहतर और कुछ हो ही नहीं सकता यह ग्रेटिट्यूड हम सब में होना चाहिए',
+    },
+    {
+      pageId: "page_7",
+      type: "text",
+      text: "अब जानते हैं बाबा बुल्ले शाह के बारे में कुछ खास बातें बाबा बुल्ले शाह (1680–1757) मुगलकालीन एक महान पंजाबी सूफी कवि, दार्शनिक और मानवतावादी थे उन्हें 'पंजाबी ज्ञानोदय का जनक' (Father of Punjabi Enlightenment) कहा जाता है उन्होंने अपनी काफी शैली की रचनाओं के माध्यम से सार्वभौमिक प्रेम, मौलिक समानता और आध्यात्मिक जागरण का संदेश दिया उन्होंने धार्मिक रूढ़िवादिता और सामाजिक भेदभाव को खुलकर चुनौती दी",
+    },
+    {
+      pageId: "page_8",
+      type: "text",
+      text: "मूल दर्शन (Core Philosophy): 1. मानवतावादी विद्रोही: बुल्ले शाह ने धर्मगुरुओं (मुल्लाओं और पंडितों) के पाखंड की कड़ी आलोचना की उनका मानना था कि ईश्वर हर दिल में बसता है — बिना प्रेम के मंदिर की दीवारें और मस्जिद के गुंबद सब खाली हैं 2. पहचान से परे: उन्होंने अहंकार (फना) के पूर्ण त्याग की वकालत की उन्होंने सभी धार्मिक, जातिगत और राष्ट्रीय लेबल हटाकर एक विश्व मानव बनने का मार्ग दिखाया",
+    },
+    {
+      pageId: "page_9",
+      type: "text",
+      text: "साहित्यिक और सांस्कृतिक विरासत: काफी शैली: बुल्ले शाह ने मुख्य रूप से काफी शैली में लिखा — यह पंजाबी, सिंधी और सराइकी कविता का एक शास्त्रीय रूप है, जिसे गाया जाने के लिए डिज़ाइन किया गया है उनकी बोलचाल की पंजाबी ने गहरे आध्यात्मिक और रहस्यमय विचारों को आम आदमी तक पहुँचाया संगीत और कव्वाली: उनकी रचनाएँ आज भी अत्यधिक पूजनीय हैं और पूरे दक्षिण एशिया में कव्वाली और लोक संगीत का अभिन्न हिस्सा हैं उनका समन्वयवाद और शांति का संदेश आज भी सुधारकों, कवियों और संगीतकारों को प्रेरित करता है",
+    },
+    {
+      pageId: "page_10",
+      type: "text-with-media",
+      text: 'एक प्रसिद्ध किस्सा: एक बार किसी ने बुल्ले शाह से पूछा — "आप कौन हैं? मुसलमान, हिंदू, सिख?" बुल्ले शाह ने मुस्कुराकर कहा: "न मैं मुसलमान, न हिंदू, न सिख मैं तो बस उसका हूँ जो सबके दिल में है मुझे कोई मस्जिद न मिले, कोई मंदिर न मिले, बस इश्क़ की गली में मेरा घर मिले" यही उनकी सूफीवाद की सबसे बड़ी सीख है — इश्क़ (प्रेम) ही सच्चा धर्म है',
+      media: [
+        {
+          type: "image",
+          url: "https://placehold.co/800x600?text=Bulleh+Shah+shrine+in+Kasur",
+          description:
+            "The mazar (shrine) of Baba Bulleh Shah in Kasur, Pakistan",
+          height: 200,
+          width: 200,
+        },
+      ],
+    },
+    {
+      pageId: "page_11",
+      type: "links",
+      links: [
+        {
+          url: "https://en.wikipedia.org/wiki/Bulleh_Shah",
+          description: "Wikipedia: Baba Bulleh Shah biography and works",
+        },
+        {
+          url: "https://hi.wikipedia.org/wiki/%E0%A4%AC%E0%A5%81%E0%A4%B2%E0%A5%8D%E0%A4%B2%E0%A5%87_%E0%A4%B6%E0%A4%BE%E0%A4%B9",
+          description: "विकिपीडिया: बुल्ले शाह (हिंदी में)",
+        },
+        {
+          url: "https://www.studyiq.com/biography/bulleh-shah/",
+          description: "StudyIQ: Detailed biography and philosophy",
+        },
+        {
+          url: "https://www.sikhiwiki.org/index.php/Bulleh_Shah",
+          description: "SikhiWiki: Spiritual impact of Bulleh Shah",
+        },
+      ],
+    },
+  ],
 };
 
 export const human_evolution: Document = {
@@ -532,7 +639,7 @@ export const doc13 = {
   ],
 };
 
-export const collection: Document[] = [doc1, human_evolution1];
+export const collection: Document[] = [baba_bulleshah, doc1, human_evolution1];
 
 export const whyEkam = [
   "Long articles feel heavy. Most people skim, not read.",

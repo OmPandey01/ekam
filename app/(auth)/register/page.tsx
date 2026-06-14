@@ -4,6 +4,7 @@ import useAuthStore from "@/data/authStore";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SideInfoGraphics from "@/components/Side_Infographics";
+import { whyEkam } from "@/data/data";
 
 import { motion, AnimatePresence } from "framer-motion";
 import { Input } from "@/components/ui/input";
@@ -33,7 +34,6 @@ import {
 } from "lucide-react";
 import { IoLogOut } from "react-icons/io5";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { whyEkam } from "@/data/data";
 
 // Feature data (same as login but with onboarding twist)
 const features = [
@@ -155,41 +155,12 @@ export default function SignupPage() {
     try {
       const result = await register({ name, email, password });
 
-      console.log("Registration result:", result); // Debug log
-
-      if (result.success) {
-        // Check if user needs verification
-        if (result.needsVerification) {
-          router.push(`/verification/${result.userId}`);
-        } else {
-          // Success! Get userId from response
-          const userId =
-            result.userId || result.data?.user?.id || result.data?.id;
-
-          if (userId) {
-            router.push(`/verification/${userId}`);
-          } else {
-            // If no userId in response, maybe email them or show success message
-            setSuccessStep("success");
-            // Or redirect to login with message
-            // router.push("/login?message=Please check your email for verification");
-          }
-        }
+      if (result.needsVerification) {
+        router.push(`/verification/${result.userId}`);
       } else {
-        // Handle specific error cases
-        if (result.exists) {
-          setError("Account already exists. Please login instead.");
-          // Optionally redirect to login after a delay
-          setTimeout(() => router.push("/login"), 2000);
-        } else if (result.alreadyVerified) {
-          setError("Account already verified. Please login.");
-          setTimeout(() => router.push("/login"), 2000);
-        } else {
-          setError(result.error || "Registration failed. Please try again.");
-        }
+        setSuccessStep("success");
       }
     } catch (error: any) {
-      console.error("Registration error:", error);
       setError(error.message || "An unexpected error occurred");
     } finally {
       setIsLoading(false);

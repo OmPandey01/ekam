@@ -135,10 +135,16 @@ const useAuthStore = create((set, get) => ({
       }
 
       // Handle other errors
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Registration failed";
+      const errorMessage = {
+        message:
+          error?.response?.data?.message ||
+          error?.message ||
+          "Registration failed",
+        response: error?.response?.data,
+        status: error?.response?.status,
+        isAxiosError: error?.isAxiosError,
+        needsVerification: error?.response?.data?.isVerified === false,
+      };
 
       set({ error: errorMessage, isLoading: false });
 

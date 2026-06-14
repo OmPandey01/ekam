@@ -1,5 +1,6 @@
 "use client";
-
+import SideInfoGraphics from "@/components/Side_Infographics";
+import { whyEkam } from "@/data/data";
 import { useRouter } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
@@ -205,80 +206,7 @@ export default function OtpVerificationPage() {
     <div className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="grid lg:grid-cols-2 min-h-screen">
         {/* LEFT SIDE - Security focused infographics */}
-        <motion.div
-          initial="hidden"
-          animate="visible"
-          variants={slideInLeft}
-          className="relative hidden lg:flex flex-col justify-between bg-gradient-to-br from-blue-950 via-indigo-900 to-purple-950 text-white p-12 xl:p-16 overflow-hidden"
-        >
-          {/* Animated background shapes */}
-          <div className="absolute inset-0 overflow-hidden">
-            <div className="absolute -top-40 -right-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse" />
-            <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse delay-1000" />
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-10 animate-pulse delay-700" />
-          </div>
-
-          <div className="relative z-10 flex flex-col h-full">
-            {/* Logo */}
-            <motion.div variants={itemVariants} className="mb-12">
-              <h2 className="text-3xl font-bold tracking-tight bg-gradient-to-r from-white to-indigo-200 bg-clip-text text-transparent">
-                Ekam
-              </h2>
-              <p className="text-indigo-200/70 text-sm mt-1">
-                motion-first reading
-              </p>
-            </motion.div>
-
-            {/* Main message */}
-            <motion.div variants={itemVariants} className="mb-12">
-              <h1 className="text-5xl xl:text-6xl font-bold leading-tight">
-                Two‑Step
-                <span className="block text-indigo-300 mt-2">Verification</span>
-              </h1>
-              <p className="text-indigo-200/80 text-lg mt-6 max-w-md">
-                We've sent a one‑time password to your email. Enter it below to
-                secure your account.
-              </p>
-            </motion.div>
-
-            {/* Feature list */}
-            <motion.div variants={containerVariants} className="space-y-6">
-              {features.map((feature, index) => (
-                <motion.div
-                  key={index}
-                  variants={itemVariants}
-                  whileHover={{
-                    x: 8,
-                    transition: { type: "spring", stiffness: 400 },
-                  }}
-                  className="flex items-start gap-4 group"
-                >
-                  <div className="p-2 rounded-lg bg-white/10 backdrop-blur-sm group-hover:bg-indigo-500/30 transition-colors duration-300">
-                    {feature.icon}
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-white">
-                      {feature.title}
-                    </h3>
-                    <p className="text-indigo-200/70 text-sm">
-                      {feature.description}
-                    </p>
-                  </div>
-                </motion.div>
-              ))}
-            </motion.div>
-
-            {/* Footer */}
-            <motion.div variants={itemVariants} className="mt-auto pt-16">
-              <div className="border-t border-white/10 pt-6">
-                <p className="text-indigo-200/50 text-sm italic">
-                  "Your security is our priority. Every session, every article."
-                </p>
-              </div>
-            </motion.div>
-          </div>
-        </motion.div>
-
+        <SideInfoGraphics data={whyEkam} />
         {/* RIGHT SIDE - OTP Form */}
         <motion.div
           initial="hidden"
