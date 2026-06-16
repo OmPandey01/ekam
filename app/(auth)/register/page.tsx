@@ -1,6 +1,8 @@
 "use client";
 import useAuthStore from "@/data/authStore";
 
+import { AxiosError } from "axios";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import SideInfoGraphics from "@/components/Side_Infographics";
@@ -154,6 +156,7 @@ export default function SignupPage() {
 
     try {
       const result = await register({ name, email, password });
+      console.log(result);
       router.push(`/verification/${result.data.userId}`);
 
       if (result.success) {
@@ -171,7 +174,7 @@ export default function SignupPage() {
 
   // Welcome back to login link
   const handleGoToLogin = () => {
-    alert("Redirect to login page"); // Replace with actual navigation
+    router.push("/login"); // Replace with actual navigation
   };
 
   return (
@@ -365,26 +368,6 @@ export default function SignupPage() {
                           className="font-medium text-teal-600 hover:text-teal-800 transition-colors"
                         >
                           Sign in
-                        </button>
-                      </motion.div>
-
-                      <motion.div
-                        variants={itemVariants}
-                        className="text-center text-xs text-slate-400"
-                      >
-                        By signing up, you agree to our{" "}
-                        <button
-                          type="button"
-                          className="underline hover:text-slate-500"
-                        >
-                          Terms
-                        </button>{" "}
-                        and{" "}
-                        <button
-                          type="button"
-                          className="underline hover:text-slate-500"
-                        >
-                          Privacy Policy
                         </button>
                       </motion.div>
                     </CardFooter>

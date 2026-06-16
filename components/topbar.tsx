@@ -26,7 +26,7 @@ function ProfileOptions(props: any) {
     },
     {
       label: "Bookmarks",
-      icon: <FiBookmark size={40} />,
+      icon: <FiBookmark />,
       action: () => router.push("/library"),
     },
     {
@@ -47,16 +47,20 @@ function ProfileOptions(props: any) {
   ];
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: isVisible ? 1 : 0, y: 0 }}
-      transition={{ duration: 0.3 }}
-      className={` flex items-center flex-col absolute top-13 right-10 rounded-2xl bg-gray-100 shadow-2xl ${isVisible ? "visible" : "hidden"} h-auto p-5 w-60 flex  justify-center items-center`}
+      initial={{ y: 10, x: -50 }}
+      animate={{ opacity: isVisible ? 1 : 0, y: 0, x: 0 }}
+      transition={{ duration: 0.5 }}
+      className={` flex items-center w-50 flex-col absolute top-13 right-10 rounded-2xl bg-lime-200 shadow-2xl ${isVisible ? "visible" : "hidden"} h-auto   flex  justify-center items-center`}
     >
+      <div className="flex flex-row w-full  pr-10 items-center ">
+        <div className="  my-5 bg-blue-300 m-3 h-10 w-10 rounded-full"></div>
+        <p>Hi, Om</p>
+      </div>
       {ProfileOptionsItems.map((option, index) => (
         <div
           key={index}
           onClick={option.action}
-          className="hover:bg-gray-200 w-full h-10 p-2 rounded-[5px] m-2 mx-2 rounded-1xl  flex items-center gap-2"
+          className="hover:bg-blue-200 w-full h-10 p-2 first:rounded-t-2xl last:rounded-b-2xl  flex justify-start  items-center gap-2"
         >
           {option.icon}
           <span>{option.label}</span>

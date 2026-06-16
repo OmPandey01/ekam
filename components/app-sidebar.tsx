@@ -54,7 +54,7 @@ export function AppSidebar() {
       style={{ display: shouldShow ? "block" : "none" }}
       onHoverStart={() => !isMobile && setIsExpanded(true)}
       onHoverEnd={() => !isMobile && setIsExpanded(false)}
-      className={`shadow-2xs bg-[#FFF6DE] ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
+      className={` bg-white shadow-2xl   ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
     >
       <div className="relative flex flex-col rounded-2xl justify-between items-baseline w-full h-full">
         {navItems.map((item) => (

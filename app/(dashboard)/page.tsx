@@ -16,14 +16,14 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className=" ml-5   h-screen w-screen flex justify-between items-center "
+        className=" bg-yellow-50  h-screen w-screen flex justify-between items-center "
       >
         <div className="  h-screen w-auto  p-2">
           {collection.map((doc, index) => (
-            <ArticleCard key={index} document={doc} />
+            <ArticleCard isVertical={true} key={index} document={doc} />
           ))}
         </div>
-        <div className=" bg-amber-100 h-screen hidden md:block  w-[30vw] p-10">
+        <div className=" bg-emerald-100 h-screen hidden md:block  w-[30vw] p-10">
           <h1 className="text-4xl font-bold">Recent Articles</h1>
         </div>
         <motion.button

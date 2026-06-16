@@ -86,7 +86,7 @@ export default function SideInfoGraphics({ data }: { data: string[] }) {
     >
       <div className="relative bg-b z-10 flex flex-col h-full gap-12">
         {/* Brand */}
-        <motion.div variants={itemVariants}>
+        {/*<motion.div variants={itemVariants}>
           <div className="flex items-center gap-2">
             <Image
               src="/ekam-logo.png"
@@ -99,7 +99,7 @@ export default function SideInfoGraphics({ data }: { data: string[] }) {
               Ekam
             </span>
           </div>
-        </motion.div>
+        </motion.div>*/}
 
         {/* Rotating message - high contrast, clean typography */}
         <motion.div variants={itemVariants} className="space-y-6">

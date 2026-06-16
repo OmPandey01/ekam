@@ -63,7 +63,7 @@ export function ListOfTopics({
   category: string;
 }) {
   return (
-    <div>
+    <div className="ml-5">
       <div className=" border-b-2 border-b-black my-3">
         <p className="text-2xl font-bold font-coiny">{category}</p>
       </div>

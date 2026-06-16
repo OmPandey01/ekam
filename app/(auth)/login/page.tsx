@@ -23,6 +23,8 @@ import {
   EyeOff,
 } from "lucide-react";
 
+import SideInfoGraphics from "@/components/Side_Infographics";
+
 import useAuthStore from "@/data/authStore";
 
 import { whyEkam } from "@/data/data";
@@ -238,7 +240,7 @@ export default function LoginPage() {
     <div className="min-h-screen w-full overflow-hidden bg-gradient-to-br from-slate-50 to-gray-100">
       <div className="grid lg:grid-cols-2 min-h-screen">
         {/* LEFT SIDE - Infographics / Banner */}
-        <SideInfo text="" />
+        <SideInfoGraphics data={whyEkam}></SideInfoGraphics>
         {/* RIGHT SIDE - Login Form */}
         <motion.div
           initial="hidden"
@@ -335,7 +337,7 @@ export default function LoginPage() {
                   <Button
                     type="submit"
                     disabled={isLoading}
-                    className="w-full h-11 bg-gradient-to-r from-indigo-600 to-indigo-700 hover:from-indigo-700 hover:to-indigo-800 text-white font-medium rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
+                    className="w-full h-11 bg-blue-500  text-white font-medium rounded-xl shadow-lg shadow-indigo-500/25 transition-all duration-300 transform hover:scale-[1.02] active:scale-[0.98]"
                   >
                     {isLoading ? (
                       <div className="flex items-center gap-2">
@@ -361,28 +363,6 @@ export default function LoginPage() {
                     className="font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
                   >
                     Create free account
-                  </button>
-                </motion.div>
-
-                <motion.div
-                  variants={itemVariants}
-                  className="text-center text-xs text-slate-400"
-                >
-                  By signing in, you agree to our{" "}
-                  <button
-                    type="button"
-                    onClick={() => router.push("/terms")}
-                    className="underline hover:text-slate-500"
-                  >
-                    Terms
-                  </button>{" "}
-                  and{" "}
-                  <button
-                    type="button"
-                    onClick={() => router.push("/privacy")}
-                    className="underline hover:text-slate-500"
-                  >
-                    Privacy Policy
                   </button>
                 </motion.div>
               </CardFooter>
