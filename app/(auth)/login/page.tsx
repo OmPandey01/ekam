@@ -232,7 +232,17 @@ export default function LoginPage() {
       router.push("/");
     } else {
       // Show error message
-      setCredentialsError(result?.data.error || "Invalid email or password");
+      console.log("Login result", result.status);
+      if (result.status === 401) {
+        setCredentialsError("Invalid email or password");
+      } else if (result.status === 403) {
+        setCredentialsError(
+          "Email not verified , redirecting to verification page",
+        );
+        router.push(`/verification/${result.user?.id}`);
+      } else {
+        setCredentialsError("An error occurred");
+      }
     }
   };
 

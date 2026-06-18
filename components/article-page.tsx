@@ -416,8 +416,6 @@ export function TextRenderer(props: {
   size?: "sm" | "md" | "lg";
   height?: number;
 }) {
-  console.log("Got the text : ", props.text);
-
   const uniqueKey = props.index !== undefined ? props.index : props.text;
 
   return (

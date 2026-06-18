@@ -1,5 +1,20 @@
 import api from "@/api-controllers/api";
+import { error } from "node:console";
+import { IoEllipsisVertical } from "react-icons/io5";
 import { create } from "zustand";
+
+type User = {
+  id: string;
+  name: string;
+  email: string;
+};
+
+type LoginResponse = {
+  success: boolean;
+  user: User;
+  isVerified: boolean;
+  statusCode: number;
+};
 
 interface AuthType {
   user: any | null;
@@ -21,13 +36,12 @@ interface AuthType {
     password: string;
     name: string;
   }) => Promise<{ success: boolean; data: any; user: any }>;
-  login: ({
-    email,
-    password,
-  }: {
-    email: string;
-    password: string;
-  }) => Promise<{ success: boolean; data: any; user: any | null }>;
+  login: ({ email, password }: { email: string; password: string }) => Promise<{
+    success: boolean;
+    data: any;
+    user: User | null;
+    status?: number;
+  }>;
   logout: () => void;
   isAuthenticated: () => boolean;
   clearError: () => void;
@@ -38,31 +52,47 @@ const useAuthStore = create<AuthType>((set, get) => ({
   user: null,
   isLoading: false,
   error: null,
+  isVerified: false,
 
   login: async ({ email, password }) => {
     set({ isLoading: true, error: null });
 
     try {
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("/auth/login", {
+        email,
+        password,
+      });
 
-      if (response.status === 200 || response.status === 201) {
-        set({ user: response.data, isLoading: false });
+      const loginResponse: LoginResponse = response.data;
 
+      if (loginResponse.success) {
+        set({ user: loginResponse.user, isLoading: false });
+        return loginResponse;
+      }
+      throw new Error("Login failed it is a test message");
+    } catch (error: any) {
+      // console.error("Login error details:", error.response);
+      if (error.response.status === 401) {
+        console.log("Invalid credentials");
+        set({ error: "Invalid credentials", isLoading: false });
         return {
-          success: true,
-          data: response.data || " ",
-          user: response.data || "",
+          success: false,
+          data: null,
+          user: null,
+          isVerified: false,
+          status: 401,
+        };
+      } else if (error.response.status === 403) {
+        console.log("👊 Needs verification", error.response);
+        set({ error: "Verification required", isLoading: false });
+        return {
+          success: false,
+          data: null,
+          user: error.response.data.user,
+          isVerified: false,
+          status: 403,
         };
       }
-
-      throw new Error("Login failed");
-    } catch (error: any) {
-      console.error("Login error details:", {
-        message: error?.message,
-        response: error?.response?.data,
-        status: error?.response?.status,
-        isAxiosError: error?.isAxiosError,
-      });
 
       const needsVerification = error?.response?.data?.isVerified === false;
       const userId = error?.response?.data?.userId;
@@ -91,9 +121,9 @@ const useAuthStore = create<AuthType>((set, get) => ({
 
       return {
         success: false,
-        data: null,
+        data: error?.response?.data,
         user: null,
-        error: errorMessage,
+        statusCode: error?.response?.status,
       };
     }
   },
@@ -127,12 +157,7 @@ const useAuthStore = create<AuthType>((set, get) => ({
 
       throw new Error("Registration failed");
     } catch (error: any) {
-      console.error("Registration error details:", {
-        message: error?.message,
-        response: error?.response?.data,
-        status: error?.response?.status,
-        isAxiosError: error?.isAxiosError,
-      });
+      console.log(error.response);
 
       if (error?.response?.status === 409) {
         const errorMsg = "User already exists. Please login instead.";
@@ -149,7 +174,54 @@ const useAuthStore = create<AuthType>((set, get) => ({
           error: errorMsg,
         };
       }
+      if (error?.response?.status === 409) {
+        const errorMsg = "User already exists. Please login instead.";
+        set({
+          error: errorMsg,
+          isLoading: false,
+        });
 
+        return {
+          success: false,
+          data: null,
+          user: null,
+          exists: true,
+          error: errorMsg,
+        };
+      }
+      if (error?.response?.status === 409) {
+        const errorMsg = "User already exists. Please login instead.";
+        set({
+          error: errorMsg,
+          isLoading: false,
+        });
+
+        return {
+          success: false,
+          data: null,
+          user: null,
+          exists: true,
+          error: errorMsg,
+        };
+      }
+      if (error?.response?.status === 403) {
+        const errorMsg = "User Not verified";
+        set({
+          error: errorMsg,
+          isLoading: false,
+        });
+
+        return {
+          success: false,
+          data: null,
+          user: null,
+          exists: true,
+          error: errorMsg,
+          userId: error?.response?.data?.userId,
+          isVerified: false,
+          status: 403,
+        };
+      }
       if (error?.response?.data?.isVerified === false) {
         const errorMsg =
           "User already exists but not verified. Please verify your email.";

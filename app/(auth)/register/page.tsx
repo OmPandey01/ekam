@@ -154,21 +154,17 @@ export default function SignupPage() {
     setIsLoading(true);
     setError("");
 
-    try {
-      const result = await register({ name, email, password });
-      console.log(result);
-      router.push(`/verification/${result.data.userId}`);
+    const result = await register({ name, email, password });
+    console.log("Signup ➡️", result);
 
-      if (result.success) {
-        router.push(`/verification/${result.data.userId}`);
-        setSuccessStep("success");
-      } else {
-        setError(result.data.error || "An unexpected error occurred");
-      }
-    } catch (error: any) {
-      setError(error.message || "An unexpected error occurred");
-    } finally {
-      setIsLoading(false);
+    if (result.success) {
+      router.push(`/verification/${result.userId}`);
+      setSuccessStep("success");
+    } else if (result.status === 403) {
+      setError("Email not verified.");
+      router.push(`/verification/${result.userId}`);
+    } else {
+      setError(result.data.error || "An unexpected error occurred");
     }
   };
 
