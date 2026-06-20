@@ -3,11 +3,13 @@ import useSidebarStore from "@/data/sideBarStore";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { FiHome, FiCompass, FiBook, FiUser } from "react-icons/fi";
+import { LuSquareLibrary } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 
 const navItems = [
   { title: "Home", url: "/", icon: FiHome },
   { title: "Explore", url: "/explore", icon: FiCompass },
+  { title: "Stories", url: "/stories", icon: LuSquareLibrary },
   { title: "Library", url: "/library", icon: FiBook },
   { title: "Profile", url: "/profile", icon: FiUser },
 ];
