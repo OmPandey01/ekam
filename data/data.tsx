@@ -294,7 +294,7 @@ export const human_evolution1: CoreDocument = {
   stats: { likes: "223", repost: "12", upvote: "122" },
   pages: [
     {
-      pageId: "human_evolution_page_1",
+      pageId: "human_1",
       type: PageType.Text,
       text: `   Om you are re-reading the same thing human evolution, the process by which human beings developed on Earth from now-extinct primates.`,
     },
@@ -663,6 +663,8 @@ export const collection: CoreDocument[] = [
 export const whyEkam = [
   "Long articles feel heavy. Most people skim, not read.",
   "We add subtle motion so your eyes don't get lost.",
+  "Did you noticed that you eye are atracted to this area, why?",
+  "Because our brain is designed this way.",
   "No dancing graphics. Just gentle, purposeful movement.",
   "You finish what you start. That's the real metric.",
   "Built for deep reading, not addictive scrolling.",

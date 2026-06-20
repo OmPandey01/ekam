@@ -82,47 +82,44 @@ const containerVariants = {
     opacity: 1,
     filter: "none",
     transition: {
-      staggerChildren: 0.2,
-      duration: 0.9,
+      staggerChildren: 0.05, // Lowered to 0.05 so words don't take too long to enter
+      duration: 0.4,
     },
   },
   exit: {
     opacity: 0,
     transition: {
       staggerChildren: 0.05,
-      staggerDirection: -1, // Optional: Makes words exit in reverse order!
-      when: "afterChildren", // Waits for all words to fade out before destroying container
+      staggerDirection: -1,
+      when: "afterChildren",
     },
   },
 };
 
+// 2. FIX: Clean up wordVariants
 const wordVariants = {
-  hidden: { opacity: 0, y: 0, filter: "blur(10px)", color: "#C2C8FF" },
+  hidden: { opacity: 0, y: 10, filter: "blur(10px)", color: "#C2C8FF" },
   visible: {
     filter: "blur(0px)",
-    color: "#00000",
+    color: "#000000", // Fixed hex code (was #00000)
     opacity: 1,
-
     scale: 1,
     y: 0,
-
-    // transition: { type: "tween", duration: 0.5, ease: "easeInOut" },
-    // transition: { type: "inertia", velocity: 50, power: 0.9 },
-
     transition: {
-      duration: 0.9,
-      type: "easeInOut" as const,
-      stiffness: 200,
-      damping: 15,
+      duration: 0.4,
+      type: "tween", // FIX: 'tween' is the correct type for easing
+      ease: "easeInOut", // FIX: ease goes here, not in type
+      // Removed staggerChildren here because words don't have children
     },
   },
   exit: {
     opacity: 0,
+    y: -10,
+    filter: "blur(10px)",
     transition: {
-      staggerChildren: 0.1,
-      staggerDirection: 2, // Forces exit to also start from: 1st, 2nd, 3rd...
+      duration: 0.3,
+      // Removed staggerChildren here
     },
-    // y: -20, // Slides upwards slightly as it fades away
   },
 };
 
@@ -227,14 +224,24 @@ export default function Page(props: {
 
   return (
     <div
-      className={`${coiny.className} bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
+      className={` bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
     >
-      <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={page.pageId} // 2. The key MUST be here to trigger the exit/enter
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0, transition: { duration: 0.5 } }}
+          className="w-full h-full flex justify-center items-center absolute"
+        >
+          <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
 
-      <ComingSoonDialog
-        open={comingSoonOpen}
-        onOpenChange={handleComingSoonPopup}
-      />
+          <ComingSoonDialog
+            open={comingSoonOpen}
+            onOpenChange={handleComingSoonPopup}
+          />
+        </motion.div>
+      </AnimatePresence>
 
       <div className="absolute bottom-0 w-full flex justify-center z-50 pointer-events-none">
         <div className="pointer-events-auto">
@@ -258,21 +265,13 @@ export function PageContent(props: {
   switch (page.type) {
     case "text":
       return (
-        <motion.div>
-          <motion.div
-            key={page.pageId}
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-            className={` md:w-[50vw] font-playwrite rounded-2xl mb-30  dark:bg-black w-[90vw] h-[90vh] flex flex-row flex-wrap  justify-center items-center px-6 my-10 `}
-          >
-            <TextRenderer
-              onAnimationComplete={() => {}}
-              text={page.text || ""}
-              index={0}
-            ></TextRenderer>
-          </motion.div>
-        </motion.div>
+        <div key={page.pageId}>
+          <TextRenderer
+            onAnimationComplete={() => {}}
+            text={page.text || ""}
+            index={page.pageId}
+          ></TextRenderer>
+        </div>
       );
 
     case "links":
@@ -430,38 +429,51 @@ export function TextRenderer(props: {
   size?: "sm" | "md" | "lg";
   height?: number;
 }) {
-  const uniqueKey = props.index !== undefined ? props.index : props.text;
+  const uniqueKey =
+    props.index !== undefined ? props.index : props.text.substring(0, 10);
+
+  // 1. Regex Match: This grabs every solid word (\S+) AND every newline (\n)
+  // Example: "Hindu,\nBuddhist," becomes ["Hindu,", "\n", "Buddhist,"]
+  const tokens = props.text.match(/\S+|\n/g) || [];
 
   return (
-    /* 1. Wrap your animating elements in AnimatePresence */
-    /* mode="wait" ensures old text completely exits before new text enters */
-    <AnimatePresence mode="sync">
+    <AnimatePresence mode="wait">
       <motion.div
-        key={uniqueKey + `${Math.random() * 20}`}
+        key={uniqueKey}
         variants={containerVariants}
         initial="hidden"
         animate="visible"
-        exit="exit" // 2. Tell Framer Motion to look for the "exit" variant
+        exit="exit"
         onAnimationComplete={props.onAnimationComplete}
-        className={`${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
+        className={` h-full w-full overflow-y-auto flex flex-col px-4`}
       >
         <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
-          {props.text.split(" ").map((word, index) => (
-            <motion.p
-              variants={wordVariants}
-              style={props.height ? { height: `${props.height}px` } : {}}
-              className={`text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${
-                props.size === "sm"
-                  ? "text-sm"
-                  : props.size === "md"
-                    ? "text-md"
-                    : "text-lg"
-              }`}
-              key={`${uniqueKey}-${index}`}
-            >
-              {word}
-            </motion.p>
-          ))}
+          {tokens.map((token, index) => {
+            // 2. If the token is a newline, render a 100% width div to force Flexbox to wrap
+            if (token === "\n") {
+              return (
+                <div key={`${uniqueKey}-${index}`} className="w-full h-0" />
+              );
+            }
+
+            // 3. Otherwise, render the animated word
+            return (
+              <motion.p
+                variants={wordVariants}
+                style={props.height ? { height: `${props.height}px` } : {}}
+                className={`text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${
+                  props.size === "sm"
+                    ? "text-sm"
+                    : props.size === "md"
+                      ? "text-md"
+                      : "text-lg"
+                }`}
+                key={`${uniqueKey}-${index}`}
+              >
+                {token}
+              </motion.p>
+            );
+          })}
         </div>
       </motion.div>
     </AnimatePresence>
