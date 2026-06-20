@@ -54,7 +54,7 @@ export function AppSidebar() {
       style={{ display: shouldShow ? "block" : "none" }}
       onHoverStart={() => !isMobile && setIsExpanded(true)}
       onHoverEnd={() => !isMobile && setIsExpanded(false)}
-      className={` bg-white shadow-2xl   ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
+      className={` bg-amber-100    ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
     >
       <div className="relative flex flex-col rounded-2xl justify-between items-baseline w-full h-full">
         {navItems.map((item) => (
@@ -62,7 +62,7 @@ export function AppSidebar() {
             onClick={() => router.push(item.url)}
             key={item.title}
             whileHover={hoverBgAnim}
-            className=" p-4 w-full transform-gpu backdrop-blur-md flex h-full items-center justify-center first:rounded-t-xl last:rounded-b-xl"
+            className="  p-4 w-full transform-gpu backdrop-blur-md flex h-full items-center justify-center first:rounded-t-xl last:rounded-b-xl"
           >
             <div className="flex h-20 min-w-20 w-full justify-center items-center">
               <item.icon size={25} />

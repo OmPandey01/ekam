@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Playwrite_GB_J, Coiny } from "next/font/google";
 import "./globals.css";
+import { StoreSync } from "@/components/StoreSync";
 import ClientLayout from "@/components/layout/client-layout";
 
 import useAuthStore from "@/data/authStore";
@@ -26,6 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`... fonts ...`}>
       <body className="min-h-full flex flex-col">
+        <StoreSync />
         {children} {/* ← ONLY this */}
       </body>
     </html>

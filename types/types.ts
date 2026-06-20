@@ -4,7 +4,7 @@
 
 export enum PageType {
   Text = "text",
-  TextWithImage = "text-with-media",
+  TextWithMedia = "text-with-media",
   // TextWithImage = "TextWithImage",
   links = "links",
   Quote = "Quote",

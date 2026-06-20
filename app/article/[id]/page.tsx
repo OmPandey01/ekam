@@ -17,7 +17,7 @@ export default async function Article({
 }) {
   const { id } = await params;
   const data = collection.find((doc) => doc.id === id);
-
+  console.log("😅", data);
   return (
     <div>
       {data && (
@@ -27,7 +27,5 @@ export default async function Article({
           text="Hey Om you are stronger than you think"
         />
       )}{" "}
-      || null
     </div>
-  );
-}
+  ) }

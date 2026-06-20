@@ -1,17 +1,12 @@
 "use client";
 import { useState } from "react";
+import Source from "./source";
 import NextButton from "@/components/page-turn-button";
+import { CoreDocument, Media, BasePage } from "@/data/data";
+import { Page as PageType } from "@/data/data";
 
-// FIX: Import types from the single source of truth (your store), not data.ts
-import {
-  CoreDocument,
-  Page,
-  PageType,
-  Media,
-  Link,
-} from "@/store/documentStore";
-
-import { AnimatePresence, motion } from "framer-motion"; // Cleaned up motion imports
+import { AnimatePresence, fillOffset, motion } from "motion/react";
+import { Coiny } from "next/font/google";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -24,10 +19,62 @@ import { HouseIcon } from "@animateicons/react/lucide";
 import { PlayIcon } from "@animateicons/react/lucide";
 
 import Dock from "@/components/Dock";
+import { Text } from "lucide-react";
+
 import ComingSoonDialog from "@/components/ComingSoonDialog";
 
-// Removed local re-declarations of MediaItem, LinkItem, PageData, DocData
-// to rely entirely on the Zustand store types.
+const coiny = Coiny({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-coiny",
+});
+
+export interface MediaItem {
+  type: string;
+  url: string;
+  description: string;
+  height: number;
+  width: number;
+}
+
+export interface LinkItem {
+  text: string;
+  url: string;
+}
+
+export interface PageData {
+  pageId: string;
+  type: string;
+  text?: string;
+
+  media?: MediaItem[];
+  links?: LinkItem[];
+}
+
+export interface DocData {
+  id: string;
+  pages: PageData[];
+}
+
+const imagesContainerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.2, // each image appears 0.2s after previous
+    },
+  },
+};
+
+const imageItemVariants = {
+  hidden: { opacity: 0, x: -200, filter: "blur(20px)" }, // extreme left
+  visible: {
+    opacity: 1,
+    x: 0,
+    filter: "blur(0px)",
+    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
+  },
+};
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -35,7 +82,7 @@ const containerVariants = {
     opacity: 1,
     filter: "none",
     transition: {
-      staggerChildren: 0.05,
+      staggerChildren: 0.05, // Lowered to 0.05 so words don't take too long to enter
       duration: 0.4,
     },
   },
@@ -49,18 +96,20 @@ const containerVariants = {
   },
 };
 
+// 2. FIX: Clean up wordVariants
 const wordVariants = {
   hidden: { opacity: 0, y: 10, filter: "blur(10px)", color: "#C2C8FF" },
   visible: {
     filter: "blur(0px)",
-    color: "#000000",
+    color: "#000000", // Fixed hex code (was #00000)
     opacity: 1,
     scale: 1,
     y: 0,
     transition: {
       duration: 0.4,
-      type: "tween",
-      ease: "easeInOut",
+      type: "tween", // FIX: 'tween' is the correct type for easing
+      ease: "easeInOut", // FIX: ease goes here, not in type
+      // Removed staggerChildren here because words don't have children
     },
   },
   exit: {
@@ -69,38 +118,38 @@ const wordVariants = {
     filter: "blur(10px)",
     transition: {
       duration: 0.3,
+      // Removed staggerChildren here
     },
   },
 };
 
-const imagesContainerVariants = {
-  hidden: { opacity: 0 },
+const imageVariant = {
+  hidden: { opacity: 0, y: -90, filter: "blur(20px)" },
   visible: {
+    filter: "none",
     opacity: 1,
+    scale: 1,
+    y: 0,
     transition: {
-      staggerChildren: 0.2,
+      duration: 20,
+      staggerChildren: 0.8,
+      type: "spring" as const,
+      stiffness: 200,
+      damping: 15,
     },
   },
 };
 
-const imageItemVariants = {
-  hidden: { opacity: 0, x: -200, filter: "blur(20px)" },
-  visible: {
-    opacity: 1,
-    x: 0,
-    filter: "blur(0px)",
-    transition: { type: "spring" as const, stiffness: 200, damping: 20 },
-  },
-};
-
-export default function PageViewer(props: {
+export default function Page(props: {
   data: CoreDocument;
   title?: string;
   index?: number;
   onNext?: () => void;
+
   text?: string;
 }) {
   const router = useRouter();
+
   const data = props.data;
   const pages = data.pages;
 
@@ -116,7 +165,10 @@ export default function PageViewer(props: {
   };
 
   const [comingSoonOpen, setComingSoonOpen] = useState(false);
-  const handleComingSoonPopup = () => setComingSoonOpen(!comingSoonOpen);
+
+  const handleComingSoonPopup = () => {
+    setComingSoonOpen(!comingSoonOpen);
+  };
 
   const items = [
     {
@@ -140,21 +192,23 @@ export default function PageViewer(props: {
     {
       icon: <HouseIcon size={30} duration={1.05} color="black" />,
       label: "Go to Home",
-      className: "!bg-green-50 !border-gray-200 !text-black",
+      className: "!bg-green-50  !border-gray-200 !text-black",
       onClick: () => router.push("/"),
     },
     {
       icon: <PlayIcon size={30} duration={1.05} color="black" />,
       label: "Start as slideshow",
-      className: "!bg-green-50 !border-gray-200 !text-black",
+      className: "!bg-green-50  !border-gray-200 !text-black",
       onClick: handleComingSoonPopup,
     },
+
     {
       icon: <ImFontSize />,
       label: "Change Font Size",
       className: "!bg-blue-100  !border-gray-200 !text-black",
       onClick: handleComingSoonPopup,
     },
+
     {
       icon: <TiArrowRightThick />,
       label: "Next Page",
@@ -162,22 +216,26 @@ export default function PageViewer(props: {
       onClick: handleNext,
     },
   ];
-
   const page = pages[index];
+  const [showNavigation, setShowNavigation] = useState(false);
+  const handleNavigationToggle = () => {
+    setShowNavigation((prev) => !prev);
+  };
 
   return (
     <div
-      className={`bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
+      className={` bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
     >
       <AnimatePresence mode="wait">
         <motion.div
-          key={page.pageId} // Uses pageId (camelCase)
+          key={page.pageId} // 2. The key MUST be here to trigger the exit/enter
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0, transition: { duration: 0.5 } }}
           className="w-full h-full flex justify-center items-center absolute"
         >
           <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
+
           <ComingSoonDialog
             open={comingSoonOpen}
             onOpenChange={handleComingSoonPopup}
@@ -195,7 +253,7 @@ export default function PageViewer(props: {
 }
 
 export function PageContent(props: {
-  page: Page;
+  page: PageType;
   onNext: () => void;
   onPrev: () => void;
 }) {
@@ -204,21 +262,18 @@ export function PageContent(props: {
 
   if (!page) return null;
 
-  // FIX: Use the enum values or exact strings from the store
   switch (page.type) {
-    case PageType.Text:
-    case "text": // Fallback string check
+    case "text":
       return (
         <div key={page.pageId}>
           <TextRenderer
             onAnimationComplete={() => {}}
             text={page.text || ""}
             index={page.pageId}
-          />
+          ></TextRenderer>
         </div>
       );
 
-    case PageType.Links:
     case "links":
       return (
         <motion.div
@@ -241,34 +296,28 @@ export function PageContent(props: {
               onClick={() => router.push(link.url)}
               key={`${page.pageId}-${index}`}
             >
-              {/* FIX: Use link.text or link.description based on your store type */}
-              <p className="px-4 text-center truncate">
-                {link.text || link.description}
-              </p>
+              <p className="px-4 text-center truncate">{link.description}</p>
             </motion.div>
           ))}
         </motion.div>
       );
 
-    case PageType.TextWithMedia:
     case "text-with-media":
-      return <TextWithMedia data={page as any} onNext={props.onNext} />;
+      return <TextWithMedia data={page} onNext={props.onNext}></TextWithMedia>;
 
     default:
-      return <p>{"Got Error: Unknown type " + page.type}</p>;
+      return <p>{"Got Error" + page.type}</p>;
   }
 }
 
 function TextWithMedia(props: {
-  data: Page & { media?: Media[] };
+  data: BasePage & { type: "text-with-media" } & { media: Media[] };
   onNext: () => void;
   index?: number;
 }) {
   const [textDone, setTextDone] = useState(false);
   const [currImage, setCurrImage] = useState<number | null>(null);
   const [slideIndex, setSlideIndex] = useState(0);
-
-  const page = props.data;
 
   function handleImageHoverStart() {
     setCurrImage(slideIndex);
@@ -277,15 +326,20 @@ function TextWithMedia(props: {
     setCurrImage(null);
   }
 
+  const page = props.data;
+
   const handleNextSlide = () => {
-    if (page.media) setSlideIndex((prev) => (prev + 1) % page.media!.length);
+    if (page.media) {
+      setSlideIndex((prev) => (prev + 1) % page.media!.length);
+    }
   };
 
   const handlePrevSlide = () => {
-    if (page.media)
+    if (page.media) {
       setSlideIndex(
         (prev) => (prev - 1 + page.media!.length) % page.media!.length,
       );
+    }
   };
 
   return (
@@ -309,7 +363,9 @@ function TextWithMedia(props: {
                 initial={{ opacity: 0, y: 10, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, y: -10, scale: 0.9 }}
-                transition={{ duration: 0.1 }}
+                transition={{
+                  duration: 0.1,
+                }}
                 onMouseEnter={handleImageHoverStart}
                 onMouseLeave={handleImageHoverEnd}
                 className="w-full h-full flex justify-center items-center"
@@ -340,7 +396,7 @@ function TextWithMedia(props: {
           onAnimationComplete={() => setTextDone(true)}
           text={page.text || ""}
           index={props.index}
-        />
+        ></TextRenderer>
       </div>
 
       <AnimatePresence>
@@ -368,13 +424,16 @@ function TextWithMedia(props: {
 
 export function TextRenderer(props: {
   text: string;
-  index?: number | string; // Updated to accept string pageId
+  index?: number;
   onAnimationComplete?: () => void;
   size?: "sm" | "md" | "lg";
   height?: number;
 }) {
   const uniqueKey =
     props.index !== undefined ? props.index : props.text.substring(0, 10);
+
+  // 1. Regex Match: This grabs every solid word (\S+) AND every newline (\n)
+  // Example: "Hindu,\nBuddhist," becomes ["Hindu,", "\n", "Buddhist,"]
   const tokens = props.text.match(/\S+|\n/g) || [];
 
   return (
@@ -386,16 +445,18 @@ export function TextRenderer(props: {
         animate="visible"
         exit="exit"
         onAnimationComplete={props.onAnimationComplete}
-        className={`h-full w-full overflow-y-auto flex flex-col px-4`}
+        className={` h-full w-full overflow-y-auto flex flex-col px-4`}
       >
         <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
           {tokens.map((token, index) => {
+            // 2. If the token is a newline, render a 100% width div to force Flexbox to wrap
             if (token === "\n") {
               return (
                 <div key={`${uniqueKey}-${index}`} className="w-full h-0" />
               );
             }
 
+            // 3. Otherwise, render the animated word
             return (
               <motion.p
                 variants={wordVariants}
@@ -418,3 +479,34 @@ export function TextRenderer(props: {
     </AnimatePresence>
   );
 }
+// export function TextRenderer(props: {
+//   text: string;
+//   index?: number;
+//   onAnimationComplete?: () => void;
+//   size?: "sm" | "md" | "lg";
+//   height?: number;
+// }) {
+//   console.log("GOt the text : ", props.text);
+//   return (
+//     <motion.div
+//       key={props.index}
+//       variants={containerVariants}
+//       initial="hidden"
+//       animate="visible"
+//       onAnimationComplete={props.onAnimationComplete}
+//       className={` ${coiny.className} h-full w-full overflow-y-auto flex flex-col px-4`}
+//     >
+//       <div className="flex flex-row flex-wrap justify-center items-center w-full max-w-2xl shrink-0 my-auto mx-auto py-12">
+//         {props.text.split(" ").map((word, index) => (
+//           <motion.p
+//             variants={wordVariants}
+//             className={`${props.height ? `h-${props.height}` : ""} text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${props.size === "sm" ? "text-sm" : props.size === "md" ? "text-md" : "text-lg"}`}
+//             key={`${props.index}-${index}`}
+//           >
+//             {word}
+//           </motion.p>
+//         ))}
+//       </div>
+//     </motion.div>
+//   );
+// }

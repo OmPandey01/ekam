@@ -50,11 +50,13 @@ function ProfileOptions(props: any) {
       initial={{ y: 10, x: -50 }}
       animate={{ opacity: isVisible ? 1 : 0, y: 0, x: 0 }}
       transition={{ duration: 0.5 }}
-      className={` flex items-center w-50 flex-col absolute top-13 right-10 rounded-2xl bg-lime-200 shadow-2xl ${isVisible ? "visible" : "hidden"} h-auto   flex  justify-center items-center`}
+      className={` flex items-center w-50 flex-col absolute top-13 right-10 rounded-2xl bg-slate-100 shadow-2xl ${isVisible ? "visible" : "hidden"} h-auto   flex  justify-center items-center`}
     >
       <div className="flex flex-row w-full  pr-10 items-center ">
-        <div className="  my-5 bg-blue-300 m-3 h-10 w-10 rounded-full"></div>
-        <p>Hi, Om</p>
+        <div className="bg-gray-300 rounded-full p-2 m-3 select-none">
+          <p className="font-coiny font-bold ">{props.userName}</p>
+        </div>
+        <p>Hi, {props.userName}</p>
       </div>
       {ProfileOptionsItems.map((option, index) => (
         <div
@@ -71,9 +73,12 @@ function ProfileOptions(props: any) {
 }
 
 export default function Topbar() {
+  const router = useRouter();
+  const user = useAuthStore((state) => state.user);
   const [showProfileOptions, setShowProfileOptions] = useState(false);
   const toggle = useSidebarStore((state) => state.toggle);
   const isOpen = useSidebarStore((state) => state.isOpen);
+  const userName = user?.name.split(" ")[0];
 
   return (
     <header className="sticky top-0 z-50 flex h-[60px] p-1 w-full items-center justify-between border-b bg-white px-4 shadow-sm md:px-6">
@@ -124,27 +129,28 @@ export default function Topbar() {
         {/* Mobile Search Icon (Shows only when the big search bar is hidden) */}
 
         {/* Write Button (Medium style) */}
+
         <Button
           variant="ghost"
+          onClick={() => router.push("/editor")}
           className="flex items-center gap-2 text-gray-600 hover:bg-transparent hover:text-gray-900"
         >
           <FiEdit3 className="h-5 w-5" />
           <span className="hidden text-base md:inline-block">Write</span>
         </Button>
+        <div
+          onClick={() => setShowProfileOptions(!showProfileOptions)}
+          className="bg-gray-300 rounded-full p-2"
+        >
+          <p className="font-coiny font-bold pointer-events-none select-none ">
+            {userName}
+          </p>
+        </div>
 
         {/* User Profile Avatar */}
-        <Avatar
-          onMouseDown={() =>
-            setShowProfileOptions(showProfileOptions ? false : true)
-          }
-          className="h-8 w-8 cursor-pointer ring-2 ring-transparent transition-all hover:ring-gray-200"
-        >
-          <AvatarImage src="https://github.com/shadcn.png" alt="@user" />
-          <AvatarFallback className="bg-gray-800 text-white text-xs">
-            US
-          </AvatarFallback>
-        </Avatar>
+
         <ProfileOptions
+          userName={userName}
           setShowProfileOptions={setShowProfileOptions}
           isVisible={showProfileOptions}
         />
