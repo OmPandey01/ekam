@@ -97,17 +97,26 @@ export default function Topbar() {
         {/*<SidebarTrigger className="text-gray-600 hover:text-gray-900" />*/}
 
         {/* Search Bar - hidden on very small screens, visible on medium+ */}
-        <div className="relative  flex items-center">
+        <motion.div
+          className="relative  flex items-center"
+          initial={{ scale: 1 }}
+          whileFocus={{
+            scale: 1.6,
+            width: "400",
+            position: "relative",
+            top: "5",
+          }}
+        >
           <FiSearch className="absolute left-3 h-4 w-4 text-gray-400" />
           <motion.input
             type="search"
             placeholder="Search..."
             // whileHover={{ scale: 1.2 }}
-            whileFocus={{ scale: 1.2, position: "relative", top: "5" }}
+            // whileFocus={{ scale: 1.05, position: "relative", top: "5" }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="  rounded-full  h-10 border-none bg-gray-100 pl-9 text-sm focus-visible:ring-1 focus-visible:ring-gray-300 w-[60vw]"
           />
-        </div>
+        </motion.div>
       </div>
 
       {/* RIGHT SIDE: Write & Profile */}

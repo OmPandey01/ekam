@@ -22,14 +22,12 @@ const ArticleCard = ({
     (!isVertical && (
       <div
         onClick={() => router.push(`article/${document.id}`)}
-        className=" flex flex-row w-full  h-40 justify-between bg-blue-100 my-12 rounded-2xl "
+        className=" flex flex-row w-full  h-40 justify-between hover:bg-blue-100  transition-all bg-white my-2  "
       >
         <div className="p-2 flex flex-col justify-between ">
           <div className="flex flex-row items-center">
             <div className="h-5 w-5 rounded-full bg-blue-500"></div>
-            <h2 className="mt-2 m-2 text-gray-400">
-              {document.author} {document.date}
-            </h2>
+            <h2 className="mt-2 m-2 text-gray-400">{document.author}</h2>
           </div>
           <h2 className="text-gray-600 font-bold text-2xl">{document.title}</h2>
           <p className="text-gray-500">{document.author}</p>

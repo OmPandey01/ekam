@@ -155,11 +155,10 @@ export default function SignupPage() {
     setError("");
 
     const result = await register({ name, email, password });
-    console.log("Signup ➡️", result);
+    // console.log("Signup ➡️", result);
 
     if (result.success) {
       router.push(`/verification/${result.userId}`);
-      setSuccessStep("success");
     } else if (result.status === 403) {
       setError("Email not verified.");
       router.push(`/verification/${result.userId}`);

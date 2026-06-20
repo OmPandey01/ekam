@@ -7,78 +7,91 @@
 //  providing valuable information to the reader. Additionally,
 //  it should be organized in a clear and logical manner, making it easy for readers to follow along
 // and understand the key points being presented.
+import {
+  rumi_guest_house,
+  rumi_only_breath,
+  rumi_two_intelligences,
+} from "./rumiData";
+
+import { Page, PageType, CoreDocument } from "@/types/types";
 
 import { title } from "motion/react-client";
 
-enum SoundEffect {
-  None = "none",
-  glass = "glass",
-  paper = "paper",
-  typing = "typing",
-  nature = "nature",
-  city = "city",
-  crowd = "crowd",
-  music = "music",
-}
+// enum SoundEffect {
+//   None = "none",
+//   glass = "glass",
+//   paper = "paper",
+//   typing = "typing",
+//   nature = "nature",
+//   city = "city",
+//   crowd = "crowd",
+//   music = "music",
+// }
 
-export enum PageType {
-  Text = "text",
-  Links = "links",
-  TextWithMedia = "text-with-media",
-}
+// export enum PageType {
+//   Text = "text",
+//   Links = "links",
+//   TextWithMedia = "text-with-media",
+// }
 
-export type Media = {
-  type: "image";
-  url: string;
-  description: string;
-  height?: number;
-  width?: number;
-  details?: any;
-};
+// export type Media = {
+//   type: "image";
+//   url: string;
+//   description: string;
+//   height?: number;
+//   width?: number;
+//   details?: any;
+// };
 
-type Link = {
-  url: string;
-  description: string;
-  priority?: number;
-};
+// type Link = {
+//   url: string;
+//   description: string;
+//   priority?: number;
+// };
 
-type PageStyle = {
-  backgroundType?: "color" | "image" | "gradient";
-  backgroundColor?: string;
-  backgroundImage?: string;
-};
+// type PageStyle = {
+//   backgroundType?: "color" | "image" | "gradient";
+//   backgroundColor?: string;
+//   backgroundImage?: string;
+// };
 
-export type BasePage = {
-  pageId: string;
-  text: string;
-};
+// export type BasePage = {
+//   pageId: string;
+//   text: string;
+// };
 
-export type Page = BasePage &
-  (
-    | {
-        type: PageType.Text;
-      }
-    | {
-        type: PageType.Links;
-        links: Link[];
-      }
-    | {
-        type: PageType.TextWithMedia;
-        media: Media[];
-      }
-  ) &
-  PageStyle;
+// export type Page = BasePage &
+//   (
+//     | {
+//         type: PageType.Text;
+//         pageId: string;
+//         text: string;
+//       }
+//     | {
+//         pageId: string;
+//         text: string;
+//         type: PageType.Links;
+//         links: Link[];
+//       }
+//     | {
+//         pageId: string;
+//         text: string;
+//         type: PageType.TextWithMedia;
+//         media: Media[];
+//       }
+//   ) &
+//   PageStyle;
 
-export type CoreDocument = {
-  id: string;
-  title: string;
-  thumbnailUrl?: string;
-  stats?: { likes: string; repost: string; upvote: string };
-  pages: Page[];
-  author?: string;
-  date?: string;
-  music?: SoundEffect;
-};
+// export type CoreDocument = {
+//   id: string;
+//   title: string;
+//   thumbnailUrl?: string;
+//   stats?: { likes: string; repost: string; upvote: string };
+//   pages: Page[];
+//   author?: string;
+//   date?: string;
+//   music?: SoundEffect;
+// };
 
 const baba_bulleshah = {
   id: "doc_bulleh_shah_gratitude",
@@ -639,7 +652,13 @@ export const doc13 = {
   ],
 };
 
-export const collection: CoreDocument[] = [doc1, human_evolution1];
+export const collection: CoreDocument[] = [
+  doc1,
+  human_evolution1,
+  rumi_guest_house,
+  rumi_only_breath,
+  rumi_two_intelligences,
+];
 
 export const whyEkam = [
   "Long articles feel heavy. Most people skim, not read.",

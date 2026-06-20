@@ -5,7 +5,7 @@ import NextButton from "@/components/page-turn-button";
 import { CoreDocument, Media, BasePage } from "@/data/data";
 import { Page as PageType } from "@/data/data";
 
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, fillOffset, motion } from "motion/react";
 import { Coiny } from "next/font/google";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
@@ -77,7 +77,7 @@ const imageItemVariants = {
 };
 
 const containerVariants = {
-  hidden: { opacity: 0, filter: "blur(1px)" },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     filter: "none",
@@ -97,18 +97,32 @@ const containerVariants = {
 };
 
 const wordVariants = {
-  hidden: { opacity: 0, y: 90, filter: "blur(100px)" },
+  hidden: { opacity: 0, y: 0, filter: "blur(10px)", color: "#C2C8FF" },
   visible: {
-    filter: "none",
+    filter: "blur(0px)",
+    color: "#00000",
     opacity: 1,
+
     scale: 1,
     y: 0,
-    transition: { type: "spring" as const, stiffness: 200, damping: 15 },
+
+    // transition: { type: "tween", duration: 0.5, ease: "easeInOut" },
+    // transition: { type: "inertia", velocity: 50, power: 0.9 },
+
+    transition: {
+      duration: 0.9,
+      type: "easeInOut" as const,
+      stiffness: 200,
+      damping: 15,
+    },
   },
   exit: {
     opacity: 0,
-    y: -20, // Slides upwards slightly as it fades away
-    transition: { duration: 0.2 },
+    transition: {
+      staggerChildren: 0.1,
+      staggerDirection: 2, // Forces exit to also start from: 1st, 2nd, 3rd...
+    },
+    // y: -20, // Slides upwards slightly as it fades away
   },
 };
 
@@ -421,9 +435,9 @@ export function TextRenderer(props: {
   return (
     /* 1. Wrap your animating elements in AnimatePresence */
     /* mode="wait" ensures old text completely exits before new text enters */
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="sync">
       <motion.div
-        key={uniqueKey}
+        key={uniqueKey + `${Math.random() * 20}`}
         variants={containerVariants}
         initial="hidden"
         animate="visible"

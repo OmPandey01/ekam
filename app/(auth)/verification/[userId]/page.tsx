@@ -149,7 +149,6 @@ export default function OtpVerificationPage() {
     e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
-      // Move to previous input on backspace if current is empty
       inputRefs.current[index - 1]?.focus();
     }
   };
@@ -164,7 +163,6 @@ export default function OtpVerificationPage() {
         newOtp[i] = digits[i];
       }
       setOtp(newOtp);
-      // Focus last filled or first empty
       const lastFilledIndex = newOtp.findIndex((digit) => digit === "");
       const focusIndex = lastFilledIndex === -1 ? 5 : lastFilledIndex;
       inputRefs.current[focusIndex]?.focus();
@@ -183,9 +181,9 @@ export default function OtpVerificationPage() {
       } else {
         setError("Verification failed. Please try again.");
       }
-      console.log("Verified user:", user);
+      // console.log("Verified user:", user);
     } catch (error) {
-      console.error("Verification failed:", error);
+      // console.error("Verification failed:", error);
     }
   };
 

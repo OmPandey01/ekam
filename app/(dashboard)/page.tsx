@@ -16,16 +16,20 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className=" bg-yellow-50  h-screen w-screen flex justify-between items-center "
+        className="   h-full w-full flex flex-row justify-center items-center overflow-hidden "
       >
-        <div className="  h-screen w-auto  p-2">
-          {collection.map((doc, index) => (
-            <ArticleCard isVertical={true} key={index} document={doc} />
-          ))}
+        <div className=" m-0 h-full w-auto overflow-scroll  max-w-fit  p-2">
+          <ul className="overflow-scroll">
+            {collection.map((doc, index) => (
+              <li key={index}>
+                <ArticleCard isVertical={false} document={doc} />
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className=" bg-emerald-100 h-screen hidden md:block  w-[30vw] p-10">
+        {/*<div className=" bg-emerald-100 h-screen hidden md:block  w-[30vw] p-10">
           <h1 className="text-4xl font-bold">Recent Articles</h1>
-        </div>
+        </div>*/}
         <motion.button
           initial={{ opacity: 0, scale: 0, borderRadius: 50 }}
           animate={{ opacity: 1, scale: 1, transition: { duration: 0.8 } }}
