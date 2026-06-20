@@ -13,26 +13,27 @@ export enum PageType {
 
 export type Page =
   | {
-      page_id: string;
+      pageId: string;
       type: PageType.Text;
       text: string;
     }
   | {
-      page_id: string;
+      pageId: string;
       type: PageType.TextWithImage;
       text: string;
       image: string;
     }
-  | { page_id: string; type: PageType.Quote; quote: string }
-  | { page_id: string; type: PageType.Collage; collage: string }
+  | { pageId: string; type: PageType.Quote; quote: string }
+  | { pageId: string; type: PageType.Collage; collage: string }
   | {
-      page_id: string;
+      pageId: string;
       type: PageType.links;
       links?: string[];
     };
 
 export type CoreDocument = {
   pages: Page[];
+  id: string;
   title: string;
   author?: string;
   thumbnailUrl?: string;

@@ -3,13 +3,7 @@ import { useState } from "react";
 import NextButton from "@/components/page-turn-button";
 
 // FIX: Import types from the single source of truth (your store), not data.ts
-import {
-  CoreDocument,
-  Page,
-  PageType,
-  Media,
-  Link,
-} from "@/store/documentStore";
+import { CoreDocument, Page, PageType } from "@/store/documentStore";
 
 import { AnimatePresence, motion } from "framer-motion"; // Cleaned up motion imports
 import { useRouter } from "next/navigation";
@@ -103,6 +97,7 @@ export default function PageViewer(props: {
   const router = useRouter();
   const data = props.data;
   const pages = data.pages;
+  console.log("👊🎁", data);
 
   const [index, setIndex] = useState(props.index ?? 0);
 
@@ -164,6 +159,7 @@ export default function PageViewer(props: {
   ];
 
   const page = pages[index];
+  console.log("👊🎁", page);
 
   return (
     <div

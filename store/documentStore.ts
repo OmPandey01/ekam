@@ -32,6 +32,7 @@ export type CoreDocument = {
   thumbnailUrl?: string;
   description?: string;
   createdAt?: Date;
+  modifiedAt?: Date;
   category?: string[];
 };
 
@@ -92,7 +93,8 @@ export const useDocumentStore = create<DocumentStore>()(
           id: newId,
           title: "Untitled Document",
           pages: [createTextPage()],
-          createdAt: new Date().toISOString(),
+          createdAt: new Date(),
+          modifiedAt: new Date(),
         };
         set((state) => ({
           documents: { ...state.documents, [newId]: newDoc },

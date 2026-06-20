@@ -10,9 +10,10 @@ import { ProtectedRoute } from "@/components/ProtectedRoutes";
 export default function Home() {
   // state.documents is a Record<string, CoreDocument> (an object)
   // We use Object.values() to convert it into an array of CoreDocument[]
-  const documentsDict = useDocumentStore((state) => state.documents);
-  const collection = Object.values(documentsDict);
-  console.log("🇮🇳", collection);
+  const documents = useDocumentStore((state) => state.documents);
+  const collection = Object.entries(documents);
+
+  console.log("collection 🇮🇳", collection);
 
   const router = useRouter();
 
@@ -27,10 +28,10 @@ export default function Home() {
         <div className="m-0 h-full w-auto overflow-scroll max-w-fit p-2">
           <ul className="overflow-scroll flex flex-col gap-4 p-4">
             {/* Now collection is an array and .map() works perfectly */}
-            {collection.map((doc, index) => (
+            {collection.map((entry, index) => (
               // Use doc.id instead of index for a more stable React key
-              <li key={`${doc.id}+${index}`}>
-                <ArticleCard isVertical={false} document={doc} />
+              <li key={`${entry[0]}+${index}`}>
+                <ArticleCard isVertical={false} document={entry[1]} />
               </li>
             ))}
 
