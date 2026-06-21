@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { IoLogOut } from "react-icons/io5";
 import { CoreDocument } from "@/types/types";
 import { useRouter } from "next/navigation";
+import IntervalText from "@/components/Interval-text";
+import ArticleCard from "@/components/article-card";
 
 export default function TabsLine() {
   return (
@@ -30,17 +32,19 @@ export default function TabsLine() {
 }
 
 function UnlistedArticles() {
-  const [data, setData] = useState<Record<string, CoreDocument>>();
+  const [data, setData] = useState<any>(null);
   const router = useRouter();
+  const unlistedMotivations = [
+    "Go on to write your first article",
+    "Your activities will appear here,but first you need to write something",
+    "Go ahead and write your first article",
+  ];
 
   useEffect(() => {
     const fetchUnlistedArticles = async () => {
-      const response: {
-        success: boolean;
-        count: number;
-        documents: Record<string, CoreDocument>;
-      } = await api.get("/documents/unpublished/me");
-      const data = response.documents;
+      const response = await api.get("/documents/unpublished/me");
+      const data = response.data.documents;
+      console.log("Data is ", data);
       setData(data);
     };
     fetchUnlistedArticles();
@@ -48,23 +52,31 @@ function UnlistedArticles() {
   return (
     (data && (
       <div>
-        {Object.values(data).map((doc) => (
-          <div onClick={() => router.push(`/editor/${doc.id}`)} key={doc.id}>
-            {doc.title}
+        {data.map((record, index) => (
+          <div
+            onClick={() => router.push(`/editor/?docId=${record.data.id}`)}
+            key={index}
+          >
+            <ArticleCard document={record.data}></ArticleCard>
           </div>
         ))}
       </div>
     )) || (
       <div className="flex justify-center items-center h-screen w-full">
-        <p>No articles yet</p>
+        <NoDataAvailable data={unlistedMotivations}></NoDataAvailable>
       </div>
     )
   );
 }
 
 function PublishedArticles() {
-  const [data, setData] = useState<Record<string, CoreDocument>>({});
+  const [data, setData] = useState<Record<string, CoreDocument> | null>(null);
   const router = useRouter();
+
+  const toPublishMotivations = [
+    "Go ahead and publish your first article",
+    "Let the world see that you exist in this corner of the world by sharing your first article",
+  ];
 
   useEffect(() => {
     const fetchUnlistedArticles = async () => {
@@ -74,6 +86,7 @@ function PublishedArticles() {
         documents: Record<string, CoreDocument>;
       } = await api.get("/documents/published/all");
       const data = response.documents;
+      console.log(data);
       setData(data);
     };
     fetchUnlistedArticles();
@@ -89,25 +102,16 @@ function PublishedArticles() {
       </div>
     )) || (
       <div className="flex justify-center items-center h-screen w-full">
-        <p>No published articles</p>
+        <NoDataAvailable data={toPublishMotivations} />
       </div>
     )
   );
 }
 
-function NoDataAvailable() {
-  const unlistedMotivations = [
-    "Go on to write your first article",
-    "Your activities will appear here,but first you need to write something",
-    "Go ahead and write your first article",
-  ];
-  const toPublishMotivations = [
-    "Go ahead and publish your first article",
-    "Let the world see that you exist in this corner of the world by sharing your first article",
-  ];
+function NoDataAvailable(props: { data: string[] }) {
   return (
     <div className="flex justify-center items-center h-screen w-full">
-      <p>No data available</p>
+      <IntervalText data={props.data} />
     </div>
   );
 }

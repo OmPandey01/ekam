@@ -15,10 +15,14 @@ import {
   AlignLeft,
   ChevronLeft,
   FileText,
+  UploadCloudIcon,
 } from "lucide-react";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { useDocumentStore, PageType } from "@/store/documentStore";
+import { GrSync } from "react-icons/gr";
+import Page from "@/components/article-page";
 
+import api from "@/api-controllers/api";
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -149,6 +153,8 @@ export default function DocumentEditor() {
     deletePage,
     updatePageText,
     isHydrated,
+    syncWithServer,
+    getDocumentFromServer,
   } = useDocumentStore();
 
   const [activePageIndex, setActivePageIndex] = useState(0);
@@ -158,11 +164,61 @@ export default function DocumentEditor() {
   const [hoveredThumb, setHoveredThumb] = useState<number | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
   const [saveFlash, setSaveFlash] = useState(false);
+  const [synced, setSynced] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [showPublishForm, setShowPublishForm] = useState(false);
+  const [showPreview, setShowPreview] = useState<boolean>(false);
+
+  const tooglePreview = () => {
+    setShowPreview(!showPreview);
+  };
+  const handlePublish = () => {
+    setShowPublishForm(!showPublishForm);
+  };
+
+  const handleSync = useCallback(async () => {
+    setToast({ message: "Syncing...", visible: true });
+    if (!docId) return;
+    setIsSyncing(true);
+    const success = await syncWithServer(docId);
+    if (success) {
+      setSynced(true);
+      setToast({ message: "Synced with server", visible: true });
+    } else {
+      setSynced(false);
+      setToast({ message: "Failed to sync with server", visible: true });
+    }
+    setToast({ message: "", visible: false });
+    setIsSyncing(false);
+  }, [docId, syncWithServer]);
 
   const titleInputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const currentDoc = docId ? documents[docId] : null;
+
+  useEffect(() => {
+    if (!docId) return;
+    const getDoc = async () => {
+      setIsSyncing(true);
+      setSynced(false);
+
+      const doc = await getDocumentFromServer(docId);
+
+      if (doc) {
+        setIsSyncing(false);
+        setSynced(true);
+      }
+    };
+    getDoc();
+  }, [docId, getDocumentFromServer]);
+
+  useEffect(() => {
+    const syncInterval = setInterval(async () => {
+      await handleSync();
+    }, 10000);
+    return () => clearInterval(syncInterval);
+  }, []);
 
   useEffect(() => {
     if (!isHydrated) return;
@@ -246,13 +302,16 @@ export default function DocumentEditor() {
     [saveTitle, cancelEditTitle],
   );
 
-  const saveDocument = useCallback(() => {
-    if (!currentDoc) return;
-    console.log("CoreDocument JSON:", JSON.stringify(currentDoc, null, 2));
-    setSaveFlash(true);
-    showToast("Progress saved");
-    setTimeout(() => setSaveFlash(false), 600);
-  }, [currentDoc, showToast]);
+  const saveDocument = useCallback(
+    (e: React.MouseEvent) => {
+      if (!currentDoc) return;
+      console.log("CoreDocument JSON:", JSON.stringify(currentDoc, null, 2));
+      setSaveFlash(true);
+      showToast("Progress saved");
+      setTimeout(() => setSaveFlash(false), 600);
+    },
+    [currentDoc, showToast],
+  );
 
   const renderThumbContent = (page: Page) => {
     if (page.type === PageType.Text || page.type === PageType.TextWithMedia) {
@@ -309,34 +368,42 @@ export default function DocumentEditor() {
           'var(--font-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
       }}
     >
+      <PublishForm
+        handlePublishPopup={handlePublish}
+        isVisible={showPublishForm}
+        document_id={docId}
+      ></PublishForm>
       {/* LEFT SIDEBAR */}
       <div className="w-[272px] min-w-[272px] flex flex-col bg-[#F5F5F7] border-r border-[#D2D2D7]/50 select-none">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#D2D2D7]/40 bg-[#FAFAFA]/70 backdrop-blur-md">
           <button
             onClick={() => router.push("/")}
-            className="flex items-center gap-2 text-[#86868B] hover:text-[#1D1D1F] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-[#E8E8ED]/80 active:scale-[0.97]"
+            className="flex justify-start w-full items-center gap-2 text-[#86868B] hover:text-[#1D1D1F] transition-colors px-2.5 py-1.5 rounded-lg hover:bg-[#E8E8ED]/80 active:scale-[0.97]"
           >
             <ChevronLeft size={16} strokeWidth={2.5} />
             <span className="text-[12px] font-semibold tracking-tight">
               Home
             </span>
           </button>
-          <motion.button
-            whileTap={{ scale: 0.93 }}
-            onClick={saveDocument}
-            className="relative flex items-center gap-1.5 bg-[#007AFF] hover:bg-[#0062D9] text-white px-3.5 py-[7px] rounded-lg text-[12px] font-semibold transition-colors shadow-sm shadow-[#007AFF]/20"
-          >
-            <Save size={13} />
-            <span>Save</span>
-            {saveFlash && (
-              <motion.div
-                initial={{ opacity: 0.6, scale: 1 }}
-                animate={{ opacity: 0, scale: 2.5 }}
-                transition={{ duration: 0.5 }}
-                className="absolute inset-0 rounded-lg bg-white/30"
-              />
-            )}
-          </motion.button>
+
+          <div className="w-50 h-auto">
+            <motion.button
+              whileTap={{ scale: 0.93 }}
+              onClick={handleSync}
+              className="relative flex items-center gap-1.5 bg-[#007AFF] hover:bg-[#0062D9] text-white px-3.5 py-[7px] rounded-lg text-[12px] font-semibold transition-colors shadow-sm shadow-[#007AFF]/20"
+            >
+              <UploadCloudIcon size={13} />
+              <span>Sync</span>
+              {isSyncing && (
+                <motion.div
+                  initial={{ opacity: 0.6, scale: 1 }}
+                  animate={{ opacity: 0, scale: 2.5 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 rounded-lg bg-white/30"
+                />
+              )}
+            </motion.button>
+          </div>
         </div>
 
         <div className="px-5 pt-4 pb-2">
@@ -369,7 +436,7 @@ export default function DocumentEditor() {
                   onMouseEnter={() => setHoveredThumb(index)}
                   onMouseLeave={() => setHoveredThumb(null)}
                   onClick={() => setActivePageIndex(index)}
-                  className={`relative group cursor-pointer rounded-xl transition-all duration-200 ${isActive ? "ring-[2.5px] ring-[#007AFF] ring-offset-[3px] ring-offset-[#F5F5F7] shadow-lg shadow-[#007AFF]/10" : "ring-1 ring-[#D2D2D7]/70 hover:ring-[#007AFF]/30"}`}
+                  className={`relative my-4 group cursor-pointer rounded-xl transition-all duration-200 ${isActive ? "ring-[2.5px] ring-[#007AFF] ring-offset-[3px] ring-offset-[#F5F5F7] shadow-lg shadow-[#007AFF]/10" : "ring-1 ring-[#D2D2D7]/70 hover:ring-[#007AFF]/30"}`}
                 >
                   <div className="aspect-[16/10] bg-white rounded-[10px] overflow-hidden relative">
                     <div className="absolute top-[5px] left-[5px] flex items-center gap-[3px] bg-[#F5F5F7]/90 backdrop-blur-sm rounded-[4px] px-[5px] py-[2px]">
@@ -432,7 +499,7 @@ export default function DocumentEditor() {
 
       {/* RIGHT AREA */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between px-8 py-4 bg-[#F5F5F7]/60 border-b border-[#D2D2D7]/30 backdrop-blur-md">
+        <div className="flex items-center justify-between px-8 py-4  bg-[#F5F5F7]/60 border-b border-[#D2D2D7]/30 backdrop-blur-md">
           <div className="flex items-center gap-3 min-w-0">
             <AnimatePresence mode="wait">
               {isEditingTitle ? (
@@ -489,16 +556,40 @@ export default function DocumentEditor() {
               )}
             </AnimatePresence>
           </div>
-          <div className="flex items-center gap-2 text-[12px] text-[#86868B] font-medium shrink-0">
+          <motion.div className="bg-white w-40 flex justify-between h-10 rounded-[10px]">
+            <motion.button
+              onClick={() => setShowPreview(false)}
+              className={`${!showPreview ? "bg-blue-400" : " "} w-40 h-full rounded-l-[10px]`}
+            >
+              Editor
+            </motion.button>
+            <motion.button
+              onClick={() => setShowPreview(true)}
+              className={`${showPreview ? "bg-blue-400" : " "} w-40 rounded-r-[10px]`}
+            >
+              Preview
+            </motion.button>
+          </motion.div>
+
+          <div className="flex   items-center gap-2 text-[12px] text-[#86868B] font-medium shrink-0">
             <FileText size={13} />
             <span className="tabular-nums">
               Page {activePageIndex + 1} of {currentDoc.pages.length}
             </span>
+
+            <motion.button
+              onClick={handlePublish}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              className="p-1.5 h-10 w-20 bg-blue-500  rounded-lg text-black hover:text-[#007AFF] hover:bg-[#007AFF]/10 transition-all active:scale-90"
+            >
+              Publish
+            </motion.button>
           </div>
         </div>
 
         <div
-          className="flex-1 flex items-center justify-center p-6 md:p-10 overflow-auto relative"
+          className="flex-1 flex bg-lime-50 items-center justify-center p-6 md:p-10 overflow-auto relative"
           style={{
             backgroundImage:
               "radial-gradient(circle, #C7C7CC 0.5px, transparent 0.5px)",
@@ -510,6 +601,7 @@ export default function DocumentEditor() {
             style={{
               width: "500px",
               height: "500px",
+              backgroundColor: "lightyellow",
               top: "10%",
               right: "5%",
               background:
@@ -522,6 +614,8 @@ export default function DocumentEditor() {
             style={{
               width: "400px",
               height: "400px",
+
+              backgroundColor: "lightgreen",
               bottom: "5%",
               left: "10%",
               background:
@@ -531,7 +625,7 @@ export default function DocumentEditor() {
           />
 
           <AnimatePresence mode="wait">
-            {activePage &&
+            {!showPreview &&
               (activePage.type === PageType.Text ||
                 activePage.type === PageType.TextWithMedia) && (
                 <motion.div
@@ -578,6 +672,11 @@ export default function DocumentEditor() {
                   <div className="h-[3px] bg-gradient-to-r from-transparent via-[#007AFF]/20 to-transparent flex-shrink-0" />
                 </motion.div>
               )}
+            {showPreview && (
+              <motion.div>
+                <Page data={currentDoc} title="Here is the title" />
+              </motion.div>
+            )}
           </AnimatePresence>
         </div>
       </div>
@@ -591,3 +690,42 @@ export default function DocumentEditor() {
     </div>
   );
 }
+
+export const PublishForm = (props: {
+  handlePublishPopup: () => void;
+  isVisible: boolean;
+  document_id: string | null;
+}) => {
+  const publish = async () => {
+    await api
+      .post(`/documents/${props.document_id}/publish`)
+      .then((res) => {
+        Toast({ message: "Document published successfully", visible: true });
+      })
+      .catch((err) => {
+        Toast({ message: "Failed to publish document", visible: true });
+        if (err.response.status === 400) {
+          console.log("Failed to publish document", err.response.data);
+        }
+      });
+  };
+  return (
+    <div
+      className={`bg-sky-200 h-150 shadow-2xl w-200 rounded-3xl ${props.isVisible ? "visible" : "hidden"} flex flex-col justify-between py-5 items-center absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
+    >
+      <div className="flex h-full w-full justify-center items-center">
+        <button className="bg-blue-600 p-2 rounded-xl m-10" onClick={publish}>
+          Publish
+        </button>
+      </div>
+      <div className="h-20 w-full flex flex-row justify-end items-end">
+        <button
+          className="bg-white p-4 m-4 rounded-2xl "
+          onClick={props.handlePublishPopup}
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};

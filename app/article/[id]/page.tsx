@@ -28,16 +28,6 @@ export default function Article({
   }, [id]);
   const collection = useDocumentStore((state) => state.documents);
   const data = collection[id];
-  console.log("😅", data);
-  return (
-    <div>
-      {data && (
-        <Page
-          data={data}
-          title="Here is the title"
-          text="Hey Om you are stronger than you think"
-        />
-      )}{" "}
-    </div>
-  );
+  // console.log("😅", data);
+  return <div>{data && <Page data={data} title="Here is the title" />} </div>;
 }

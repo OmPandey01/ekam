@@ -5,7 +5,7 @@ import NextButton from "@/components/page-turn-button";
 // FIX: Import types from the single source of truth (your store), not data.ts
 import { CoreDocument, Page, PageType } from "@/store/documentStore";
 
-import { AnimatePresence, motion } from "framer-motion"; // Cleaned up motion imports
+import { AnimatePresence, motion, number } from "framer-motion"; // Cleaned up motion imports
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -364,13 +364,14 @@ function TextWithMedia(props: {
 
 export function TextRenderer(props: {
   text: string;
+
   index?: number | string; // Updated to accept string pageId
   onAnimationComplete?: () => void;
   size?: "sm" | "md" | "lg";
   height?: number;
 }) {
   const uniqueKey =
-    props.index !== undefined ? props.index : props.text.substring(0, 10);
+    props.index !== undefined ? props.index : props.text.substring(0, 2);
   const tokens = props.text.match(/\S+|\n/g) || [];
 
   return (

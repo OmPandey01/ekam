@@ -1,7 +1,9 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import api from "@/api-controllers/api";
 
 import { collection } from "@/data/data";
+import { error } from "node:console";
 
 // ─── Types ──────────────────────────────────────────────────────
 export enum PageType {
@@ -34,6 +36,7 @@ export type CoreDocument = {
   createdAt?: Date;
   modifiedAt?: Date;
   category?: string[];
+  lastSync?: Date;
 };
 
 // ─── Helpers ────────────────────────────────────────────────────
@@ -56,9 +59,11 @@ const createTextPage = (): Page => ({
 interface DocumentStore {
   documents: Record<string, CoreDocument>;
   isHydrated: boolean; // Ensure this is here
+  getDocumentFromServer: (id: string) => Promise<boolean>;
 
   // Actions
   syncWithCollection: (collection: CoreDocument[]) => void;
+  syncWithServer: (docId: string) => Promise<boolean | undefined>;
   createDocument: () => string;
   updateDocument: (id: string, updates: Partial<CoreDocument>) => void;
   addPage: (docId: string) => void;
@@ -86,7 +91,58 @@ export const useDocumentStore = create<DocumentStore>()(
           return { documents: updatedDocuments };
         });
       },
+      syncWithServer: async (docId: string) => {
+        const doc = get().documents[docId];
+        if (!doc) return;
+        try {
+          const response = await api.post(`/documents/syncDocument/`, {
+            document_id: docId,
+            document: doc,
+          });
 
+          set((state) => ({
+            documents: {
+              ...state.documents,
+              [docId]: { ...state.documents[docId], lastSync: new Date() },
+            },
+          }));
+
+          return true;
+        } catch (e) {
+          console.error(e);
+          return false;
+        }
+
+        //first check if doc is already there on syncWithServer
+      },
+
+      getDocumentFromServer: async (id: string) => {
+        try {
+          const response = await api.get(`/documents/${id}/`);
+          const doc = response.data;
+          if (!doc) return false;
+
+          set((state) => ({
+            documents: {
+              ...state.documents,
+              [id]: { ...doc, lastSync: new Date() },
+            },
+          }));
+
+          return true;
+        } catch (e) {
+          if (e.response?.status === 404) {
+            return false;
+          }
+
+          // Only log unexpected errors
+          // console.error("Unexpected error:", e);
+
+          // Show user message
+          console.log("Failed to load document");
+          return false;
+        }
+      },
       createDocument: () => {
         const newId = generateId();
         const newDoc: CoreDocument = {
@@ -109,7 +165,7 @@ export const useDocumentStore = create<DocumentStore>()(
           return {
             documents: {
               ...state.documents,
-              [id]: { ...existingDoc, ...updates },
+              [id]: { ...existingDoc, ...updates, modifiedAt: new Date() },
             },
           };
         });
@@ -124,6 +180,7 @@ export const useDocumentStore = create<DocumentStore>()(
               ...state.documents,
               [docId]: {
                 ...doc,
+                modifiedAt: new Date(),
                 pages: [...doc.pages, createTextPage()],
               },
             },
@@ -138,8 +195,10 @@ export const useDocumentStore = create<DocumentStore>()(
           return {
             documents: {
               ...state.documents,
+
               [docId]: {
                 ...doc,
+                modifiedAt: new Date(),
                 pages: doc.pages.filter((p) => p.pageId !== pageId),
               },
             },
@@ -156,6 +215,7 @@ export const useDocumentStore = create<DocumentStore>()(
               ...state.documents,
               [docId]: {
                 ...doc,
+                modifiedAt: new Date(),
                 pages: doc.pages.map((page) =>
                   page.pageId === pageId ? { ...page, text } : page,
                 ),
