@@ -1,208 +1,163 @@
-import { CoreDocument } from "@/store/documentStore";
+import React from "react";
 import Image from "next/image";
-import { BiRepost } from "react-icons/bi";
-import { AiFillLike } from "react-icons/ai";
-import { PiHandsClapping } from "react-icons/pi";
 import { useRouter } from "next/navigation";
+import { Calendar, User, Trash2, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
-import { Calendar, Heart, Play, User } from "lucide-react";
-import { CLIENT_PUBLIC_FILES_PATH } from "next/dist/shared/lib/constants";
-import { Button } from "./ui/button";
 
-const ArticleCard = ({
-  document,
-  isVertical = false,
-}: {
-  document: CoreDocument;
-  isVertical?: boolean;
-  isFeatured?: boolean;
-}) => {
-  const router = useRouter();
-  return (
-    (!isVertical && (
-      <div
-        onClick={() => router.push(`article/${document.id}`)}
-        className=" flex flex-row w-full  h-40 justify-between hover:bg-blue-100  transition-all bg-white my-2  "
-      >
-        <div className="p-2 flex flex-col justify-between ">
-          <div className="flex flex-row items-center">
-            <div className="h-5 w-5 rounded-full bg-blue-500"></div>
-            <h2 className="mt-2 m-2 text-gray-400">{document.author}</h2>
-          </div>
-          <h2 className="text-gray-600 font-bold text-2xl">{document.title}</h2>
-          <p className="text-gray-500">{document.author}</p>
+// Types
+export type Page = any;
 
-          {/*<div className="flex flex-row justify-between items-center">
-            <div className="flex flex-row items-center">
-              <AiFillLike />
-              <p className="m-1">{document.stats?.likes}</p>
-            </div>
-            <div className="flex flex-row items-center">
-              <BiRepost />
-              <p className="m-1">{document.stats?.repost}</p>
-            </div>
-            <div className="flex flex-row items-center">
-              <PiHandsClapping />
-              <p className="m-1">{document.stats?.upvote}</p>
-            </div>
-          </div>*/}
-        </div>
-        {document.thumbnailUrl && (
-          <Image
-            height={200}
-            width={200}
-            src={document.thumbnailUrl}
-            alt={document.title}
-            className=" w-auto m-5"
-          />
-        )}
-      </div>
-    )) ||
-    (isVertical && (
-      <div className=" m-5 rounded-2xl w-[400px] bg-gray-50  flex flex-col ">
-        {document.thumbnailUrl && (
-          <div className="overflow-clip w-full h-40 rounded-t-2xl ">
-            <Image
-              height={300}
-              width={300}
-              src={document.thumbnailUrl}
-              alt={document.title}
-              className=" h-[300px] w-auto object-cover"
-            />
-          </div>
-        )}
-        <div className="flex mt-5 flex-col w-auto pl-5  justify-centeritems-center">
-          <p className="  font-bold text-2xl">{document.title}</p>
-          <p className="text-gray-500">{document.author}</p>
-        </div>
-        <div className="flex flex-col w-auto pl-3  justify-centeritems-center">
-          <ColoredTags tags={["Psychology", "History", "Humanities"]} />
-        </div>
-        <div className="flex flex-col w-auto  justify-center items-center">
-          <Button
-            className="bg-lime-300 font-bold text-black w-full hover:bg-lime-400 rounded-b-full rounded-r-full h-10"
-            onClick={() => router.push(`article/${document.id}`)}
-          >
-            Read It
-          </Button>
-        </div>
-
-        {/*
-        <div className="flex flex-row justify-between items-center pl-5 pr-5">
-          <div className="flex flex-row items-center">
-            <AiFillLike />
-            <p className="m-1">{document.stats?.likes}</p>
-          </div>
-          <div className="flex flex-row items-center">
-            <BiRepost />
-            <p className="m-1">{document.stats?.repost}</p>
-          </div>
-          <div className="flex flex-row items-center">
-            <PiHandsClapping />
-            <p className="m-1">{document.stats?.upvote}</p>
-          </div>
-        </div>*/}
-      </div>
-    ))
-  );
+export type CoreDocument = {
+  id: string;
+  pages: Page[];
+  title: string;
+  author?: string;
+  thumbnailUrl?: string;
+  description?: string;
+  createdAt?: Date;
+  modifiedAt?: Date;
+  category?: string[];
+  lastSync?: Date;
 };
 
-type FeaturedArticleProps = {
+interface ArticleCardProps {
   document: CoreDocument;
-};
-
-export function ColoredTags({ tags }: { tags: string[] }) {
-  return (
-    <div className="flex flex-row">
-      {tags.map((tag, index) => (
-        <div
-          key={index}
-          onClick={() =>
-            alert(
-              "You can access all article in this category, this feature is coming later this week.",
-            )
-          }
-          className="bg-blue-100  hover:bg-blue-400 active:bg-blue-800 m-1 flex flex-row justify-center items-center text-white rounded-full px-3 py-1 text-sm font-medium"
-        >
-          <div className="bg-blue-500  rounded-full h-2 w-2 m-2"></div>
-          <span className="font-black text-black ">{tag}</span>
-        </div>
-      ))}
-    </div>
-  );
+  deleteMode?: boolean;
+  onDelete?: (id: string) => void;
 }
 
-export function FeaturedArticle({ document }: FeaturedArticleProps) {
+export default function ArticleCard({
+  document,
+  deleteMode = false,
+  onDelete,
+}: ArticleCardProps) {
+  const router = useRouter();
+
+  // Helper to format date cleanly
+  const formatDate = (date?: Date) => {
+    if (!date) return null;
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(date));
+  };
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.45 }}
-      className="overflow-hidden rounded-3xl border border-neutral-200 bg-white shadow-sm"
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="group relative flex w-full flex-col sm:flex-row gap-6 rounded-3xl border border-neutral-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-neutral-200/80"
     >
-      <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
-        {/* Thumbnail */}
-        <div className="relative h-[320px] overflow-hidden">
+      {/* Left Column: Thumbnail or Beautiful Abstract Minimal Graphic */}
+      <div className="relative h-44 w-full sm:w-44 sm:min-w-[11rem] flex-shrink-0 overflow-hidden rounded-2xl">
+        {document.thumbnailUrl ? (
           <Image
-            src={document.thumbnailUrl || "/placeholder.jpg"}
+            src={document.thumbnailUrl}
             alt={document.title}
-            height={200}
-            width={200}
-            className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+            fill
+            className="object-cover transition-transform duration-500 group-hover:scale-103"
           />
+        ) : (
+          /* Beautiful Textless Placeholder Graphic */
+          <div className="relative flex h-full w-full items-center justify-center overflow-hidden bg-gradient-to-tr from-indigo-100/90 via-purple-100/90 to-pink-50/60 rounded-2xl">
+            {/* Background Dot Matrix Pattern */}
+            <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1.5px,transparent_1.5px)] [background-size:14px_14px] opacity-70" />
 
-          <span className="absolute left-5 top-5 rounded-full bg-black/70 px-4 py-1 text-sm font-medium text-white backdrop-blur">
-            Featured
-          </span>
-        </div>
+            {/* Dotted Inner Frame */}
+            <div className="absolute inset-3 rounded-xl border-[2px] border-dotted border-indigo-400" />
 
-        {/* Content */}
-        <div className="flex flex-col justify-between p-8">
-          <div>
-            <h2 className="mt-4 text-4xl font-bold leading-tight text-neutral-900">
-              {document.title}
-            </h2>
+            {/* Minimal Ambient Shapes */}
+            <div className="absolute h-20 w-20 rounded-full bg-gradient-to-br from-indigo-400/20 to-purple-400/20 blur-md translate-x-3 -translate-y-3" />
+            <div className="absolute h-16 w-16 rounded-full bg-gradient-to-br from-pink-400/10 to-rose-400/20 blur-md -translate-x-4 translate-y-4 mix-blend-multiply" />
 
-            <p className="mt-4 text-lg leading-7 text-neutral-500">
-              Experience this story with animated transitions and synchronized
-              visuals.
-            </p>
+            {/* Centerpiece Minimal Geometric Representation (Simulated abstract page layout) */}
+            {/*<div className="relative z-10 flex h-11 w-9 flex-col justify-between rounded-lg bg-white/75 p-2 shadow-[0_4px_12px_rgba(165,180,252,0.15)] backdrop-blur-[2px] border border-white/60">
+              <div className="h-1 w-full rounded-full bg-indigo-300/60" />
+              <div className="h-1 w-5/6 rounded-full bg-indigo-300/40" />
+              <div className="h-1 w-2/3 rounded-full bg-indigo-300/40" />
+              <div className="mt-1 h-2 w-full rounded-sm bg-gradient-to-r from-purple-200/50 to-pink-200/50" />
+            </div>*/}
+          </div>
+        )}
+      </div>
 
-            <div className="mt-6 flex flex-wrap items-center gap-6 text-sm text-neutral-500">
+      {/* Right Column: Content */}
+      <div className="flex flex-1 flex-col justify-between py-0.5">
+        <div>
+          {/* Categories / Tags (Optional) */}
+          {document.category && document.category.length > 0 && (
+            <div className="mb-2.5 flex flex-wrap gap-1.5">
+              {document.category.map((cat, idx) => (
+                <span
+                  key={idx}
+                  className="inline-flex items-center rounded-full bg-neutral-50 border border-neutral-200/60 px-2.5 py-0.5 text-xs font-medium text-neutral-600"
+                >
+                  {cat}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Title */}
+          <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-neutral-900 line-clamp-2 leading-snug group-hover:text-neutral-800 transition-colors">
+            {document.title}
+          </h2>
+
+          {/* Meta Information (Author & Date) */}
+          {(document.author || document.createdAt) && (
+            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-neutral-400">
               {document.author && (
-                <div className="flex items-center gap-2">
-                  <User size={16} />
-                  <span>{document.author}</span>
+                <div className="flex items-center gap-1">
+                  <User size={13} className="text-neutral-300" />
+                  <span className="truncate max-w-[140px]">
+                    <span>{document.author?.name}</span>
+                  </span>
                 </div>
               )}
 
               {document.createdAt && (
-                <div className="flex items-center gap-2">
-                  <Calendar size={16} />
-                  <span>{document.createdAt.toISOString()}</span>
+                <div className="flex items-center gap-1">
+                  <Calendar size={13} className="text-neutral-300" />
+                  <span>{formatDate(document.createdAt)}</span>
                 </div>
               )}
             </div>
-          </div>
+          )}
 
-          <div className="mt-8 flex items-center justify-between">
-            <div className="flex gap-6 text-sm text-neutral-600">
-              <div className="flex items-center gap-2">
-                <Play size={16} />
-                <span>
-                  {document.pages.length} scene
-                  {document.pages.length !== 1 ? "s" : ""}
-                </span>
-              </div>
-            </div>
+          {/* Description (Optional) */}
+          {document.description && (
+            <p className="mt-3 text-sm leading-relaxed text-neutral-500 line-clamp-2">
+              {document.description}
+            </p>
+          )}
+        </div>
 
-            <button className="rounded-full bg-emerald-700 px-6 py-3 font-semibold text-white transition hover:bg-emerald-800">
-              Continue →
+        {/* Action Buttons */}
+        <div className="mt-5 flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => router.push(`/article/${document.id}`)}
+            className="flex items-center gap-1.5 rounded-full bg-neutral-900 px-5 py-2 text-sm font-medium text-white transition-all hover:bg-neutral-800 active:bg-neutral-950 shadow-sm"
+          >
+            Read Article
+            <ArrowRight size={14} />
+          </button>
+
+          {deleteMode && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                if (onDelete) onDelete(document.id);
+              }}
+              className="flex items-center gap-1.5 rounded-full bg-red-50 border border-red-100 px-4 py-2 text-sm font-medium text-red-600 transition-colors hover:bg-red-100/70 hover:text-red-700 active:bg-red-200"
+            >
+              <Trash2 size={14} />
+              Delete
             </button>
-          </div>
+          )}
         </div>
       </div>
     </motion.div>
   );
 }
-export default ArticleCard;

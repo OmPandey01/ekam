@@ -1,5 +1,6 @@
 "use client";
 import Page from "@/components/article-page";
+import api from "@/api-controllers/api";
 
 // import { collection } from "@/data/data";
 
@@ -18,6 +19,7 @@ export default function Article({
   params: Promise<{ id: string }>;
 }) {
   const [id, setId] = useState("");
+  const [data, setData] = useState(null);
   useEffect(() => {
     const getId = async () => {
       const { id } = await params;
@@ -25,8 +27,19 @@ export default function Article({
     };
     getId();
   }, [id]);
-  const collection = useDocumentStore((state) => state.documents);
-  const data = collection[id];
-  // console.log("😅", data);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (id) {
+        const response = await api.get(`/articles/${id}`);
+        const data = response;
+        console.log("data👌", data);
+        setData(data.data.document);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  console.log("😅", data);
   return <div>{data && <Page data={data} title="Here is the title" />} </div>;
 }

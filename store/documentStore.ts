@@ -2,9 +2,6 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import api from "@/api-controllers/api";
 
-import { collection } from "@/data/data";
-import { error } from "node:console";
-
 // ─── Types ──────────────────────────────────────────────────────
 export enum PageType {
   Text = "text",

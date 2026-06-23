@@ -96,9 +96,9 @@ export default function PageViewer(props: {
   text?: string;
 }) {
   const router = useRouter();
-  const data = props.data;
+  const data = props.data.data;
   const pages = data.pages;
-  console.log("👊🎁", data);
+  console.log("👊🎁 🇮🇳", data);
 
   const [index, setIndex] = useState(props.index ?? 0);
 
@@ -159,8 +159,8 @@ export default function PageViewer(props: {
     },
   ];
 
+  console.log("👊🎁", pages);
   const page = pages[index];
-  console.log("👊🎁", page);
 
   return (
     <div

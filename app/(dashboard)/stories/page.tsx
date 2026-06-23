@@ -7,31 +7,42 @@ import { CoreDocument } from "@/types/types";
 import { useRouter } from "next/navigation";
 import IntervalText from "@/components/Interval-text";
 import ArticleCard from "@/components/article-card";
+import { ProtectedRoute } from "@/components/ProtectedRoutes";
 
 export default function TabsLine() {
   return (
-    <Tabs defaultValue="Unlisted">
-      <TabsList variant="line">
-        <TabsTrigger className=" w-[50vw]" value="Unlisted">
-          Unlisted
-        </TabsTrigger>
-        <TabsTrigger value="published">Published</TabsTrigger>
-        <TabsTrigger value="ideas">Ideas</TabsTrigger>
-      </TabsList>
-      <TabsContent value="Unlisted">
-        <UnlistedArticles />
-      </TabsContent>
-      <TabsContent value="published">
-        <PublishedArticles />
-      </TabsContent>
-      {/*<TabsContent value="ideas">
+    <ProtectedRoute>
+      <Tabs defaultValue="Unlisted">
+        <TabsList variant="line">
+          <TabsTrigger className=" w-[50vw]" value="Unlisted">
+            Unlisted
+          </TabsTrigger>
+          <TabsTrigger value="published">Published</TabsTrigger>
+          <TabsTrigger value="ideas">Ideas</TabsTrigger>
+        </TabsList>
+        <TabsContent value="Unlisted">
+          <UnlistedArticles />
+        </TabsContent>
+        <TabsContent value="published">
+          <PublishedArticles />
+        </TabsContent>
+        {/*<TabsContent value="ideas">
         <IdeasArticles />
       </TabsContent>*/}
-    </Tabs>
+      </Tabs>
+    </ProtectedRoute>
   );
 }
 
 function UnlistedArticles() {
+  const onDelete = async (id: string) => {
+    const res = await api.delete(`/documents/${id}`, {
+      withCredentials: true,
+    });
+    if (res.status === 200) {
+      setData(data.filter((doc: any) => doc.id !== id));
+    }
+  };
   const [data, setData] = useState<any>(null);
   const router = useRouter();
   const unlistedMotivations = [
@@ -50,25 +61,40 @@ function UnlistedArticles() {
     fetchUnlistedArticles();
   }, []);
   return (
-    data && (
+    (data && (
       <div>
         {data.map((record: any, index: number) => (
           <div
             onClick={() => router.push(`/editor/?docId=${record.data.id}`)}
             key={index}
           >
-            <ArticleCard document={record.data}></ArticleCard>
+            <ArticleCard
+              onDelete={onDelete}
+              deleteMode={true}
+              document={record.data}
+            ></ArticleCard>
           </div>
         ))}
+      </div>
+    )) || (
+      <div className="flex justify-center items-center h-screen w-full">
+        <NoDataAvailable data={unlistedMotivations} />
       </div>
     )
   );
 }
 
 function PublishedArticles() {
-  const [data, setData] = useState<Record<string, CoreDocument> | null>(null);
+  const [data, setData] = useState<any>([]);
   const router = useRouter();
-
+  const onDelete = async (id: string) => {
+    const res = await api.delete(`/documents/${id}`, {
+      withCredentials: true,
+    });
+    if (res.status === 200) {
+      setData(data.filter((doc: any) => doc.id !== id));
+    }
+  };
   const toPublishMotivations = [
     "Go ahead and publish your first article",
     "Let the world see that you exist in this corner of the world by sharing your first article",
@@ -79,7 +105,7 @@ function PublishedArticles() {
       const response: {
         success: boolean;
         count: number;
-        documents: Record<string, CoreDocument>;
+        documents: any;
         data: any;
       } = await api.get("/documents/published/all");
       const data = response.data.documents;
@@ -91,9 +117,16 @@ function PublishedArticles() {
   return (
     (data && (
       <div>
-        {Object.values(data).map((doc) => (
-          <div onClick={() => router.push(`/article/${doc.id}`)} key={doc.id}>
-            {doc.title}
+        {data.map((entry: any, index: number) => (
+          <div
+            onClick={() => router.push(`/editor/?docId=${entry.document_id}`)}
+            key={index}
+          >
+            <ArticleCard
+              onDelete={onDelete}
+              deleteMode={true}
+              document={entry.document.data}
+            ></ArticleCard>
           </div>
         ))}
       </div>

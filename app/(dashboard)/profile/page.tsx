@@ -1,6 +1,7 @@
 "use client";
 import api from "@/api-controllers/api";
 import { useEffect, useState } from "react";
+import { ProtectedRoute } from "@/components/ProtectedRoutes";
 
 export default function ProfilePage() {
   const [user, setUser] = useState<null | { name: string; email: string }>(
@@ -18,11 +19,13 @@ export default function ProfilePage() {
     fetchUser();
   }, []);
   return (
-    user && (
+    <ProtectedRoute>
+      user && (
       <div>
-        <p>{user.name}</p>
-        <p>{user.email}</p>
+        <p>{user!.name}</p>
+        <p>{user!.email}</p>
       </div>
-    )
+      )
+    </ProtectedRoute>
   );
 }
