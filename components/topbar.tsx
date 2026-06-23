@@ -2,7 +2,7 @@
 import useSidebarStore from "@/data/sideBarStore";
 import { TbLayoutSidebarLeftExpandFilled } from "react-icons/tb";
 import { TbLayoutSidebarRightExpandFilled } from "react-icons/tb";
-import { IntervalText } from "@/components/Interval-text";
+// import IntervalText from "@/components/Interval-text";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Input } from "@/components/ui/input";

@@ -35,7 +35,17 @@ interface AuthType {
     email: string;
     password: string;
     name: string;
-  }) => Promise<{ success: boolean; data: any; user: any }>;
+  }) => Promise<{
+    success: boolean;
+    data: any;
+    user: User | null;
+    userId: string | null | undefined;
+    status: number;
+    error?: string;
+    isVerified?: boolean;
+    exists?: boolean;
+    needsVerification?: boolean;
+  }>;
   login: ({ email, password }: { email: string; password: string }) => Promise<{
     success: boolean;
     data: any;
@@ -67,7 +77,12 @@ const useAuthStore = create<AuthType>((set, get) => ({
 
       if (loginResponse.success) {
         set({ user: loginResponse.user, isLoading: false });
-        return loginResponse;
+        return {
+          success: true,
+          status: loginResponse.statusCode,
+          data: loginResponse.user,
+          user: loginResponse.user,
+        };
       }
       throw new Error("Login failed it is a test message");
     } catch (error: any) {
@@ -149,118 +164,30 @@ const useAuthStore = create<AuthType>((set, get) => ({
         return {
           success: true,
           data: response.data,
-          user: response.data.user || response.data,
-          userId: response.data.user?.id || response.data.id,
+          user: response.data.user,
+          userId: response.data.user?.id || response.data.id || null,
           status: response.status,
+          needsVerification: false,
         };
       }
-
       throw new Error("Registration failed");
+
+      // throw new Error("Registration failed");
     } catch (error: any) {
+      const errorMsg = "Error signing you up, try again later";
+      set({ error: errorMsg, isLoading: false });
       console.log(error.response);
-
-      if (error?.response?.status === 409) {
-        const errorMsg = "User already exists. Please login instead.";
-        set({
-          error: errorMsg,
-          isLoading: false,
-        });
-
-        return {
-          success: false,
-          data: null,
-          user: null,
-          exists: true,
-          error: errorMsg,
-        };
-      }
-      if (error?.response?.status === 409) {
-        const errorMsg = "User already exists. Please login instead.";
-        set({
-          error: errorMsg,
-          isLoading: false,
-        });
-
-        return {
-          success: false,
-          data: null,
-          user: null,
-          exists: true,
-          error: errorMsg,
-        };
-      }
-      if (error?.response?.status === 409) {
-        const errorMsg = "User already exists. Please login instead.";
-        set({
-          error: errorMsg,
-          isLoading: false,
-        });
-
-        return {
-          success: false,
-          data: null,
-          user: null,
-          exists: true,
-          error: errorMsg,
-        };
-      }
-      if (error?.response?.status === 403) {
-        const errorMsg = "User Not verified";
-        set({
-          error: errorMsg,
-          isLoading: false,
-        });
-
-        return {
-          success: false,
-          data: null,
-          user: null,
-          exists: true,
-          error: errorMsg,
-          userId: error?.response?.data?.userId,
-          isVerified: false,
-          status: 403,
-        };
-      }
-      if (error?.response?.data?.isVerified === false) {
-        const errorMsg =
-          "User already exists but not verified. Please verify your email.";
-        set({
-          error: errorMsg,
-          isLoading: false,
-        });
-
-        return {
-          success: false,
-          data: null,
-          user: null,
-          needsVerification: true,
-          userId: error?.response?.data?.userId,
-          error: errorMsg,
-        };
-      }
-
-      const errorMessage =
-        error?.response?.data?.message ||
-        error?.message ||
-        "Registration failed";
-
-      // Log the full error details for debugging
-      console.error("Full registration error:", {
-        message: errorMessage,
-        response: error?.response?.data,
-        status: error?.response?.status,
-        isAxiosError: error?.isAxiosError,
-        needsVerification: error?.response?.data?.isVerified === false,
-      });
-
-      set({ error: errorMessage, isLoading: false });
 
       return {
         success: false,
-        data: null,
-        user: null,
-        error: errorMessage,
+        data: error.response.data,
+        user: error.response.data.user,
+        userId:
+          error.response.data.user?.userId ||
+          error.response.data.userId ||
+          null,
+        status: error.response.status,
+        needsVerification: !(error.response.data.isVerified ?? true),
       };
     }
   },

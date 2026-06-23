@@ -1,4 +1,4 @@
-import { CoreDocument } from "../data/data";
+import { CoreDocument } from "@/store/documentStore";
 import Image from "next/image";
 import { BiRepost } from "react-icons/bi";
 import { AiFillLike } from "react-icons/ai";
@@ -31,8 +31,6 @@ const ArticleCard = ({
           </div>
           <h2 className="text-gray-600 font-bold text-2xl">{document.title}</h2>
           <p className="text-gray-500">{document.author}</p>
-          <p className="text-gray-500">{document.date}</p>
-          <p>{document.music}</p>
 
           {/*<div className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-center">
@@ -145,9 +143,11 @@ export function FeaturedArticle({ document }: FeaturedArticleProps) {
       <div className="grid lg:grid-cols-[1.2fr_0.8fr]">
         {/* Thumbnail */}
         <div className="relative h-[320px] overflow-hidden">
-          <img
+          <Image
             src={document.thumbnailUrl || "/placeholder.jpg"}
             alt={document.title}
+            height={200}
+            width={200}
             className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
           />
 
@@ -159,12 +159,6 @@ export function FeaturedArticle({ document }: FeaturedArticleProps) {
         {/* Content */}
         <div className="flex flex-col justify-between p-8">
           <div>
-            {document.music && (
-              <span className="inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">
-                Motion Reading
-              </span>
-            )}
-
             <h2 className="mt-4 text-4xl font-bold leading-tight text-neutral-900">
               {document.title}
             </h2>
@@ -182,10 +176,10 @@ export function FeaturedArticle({ document }: FeaturedArticleProps) {
                 </div>
               )}
 
-              {document.date && (
+              {document.createdAt && (
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />
-                  <span>{document.date}</span>
+                  <span>{document.createdAt.toISOString()}</span>
                 </div>
               )}
             </div>
@@ -200,13 +194,6 @@ export function FeaturedArticle({ document }: FeaturedArticleProps) {
                   {document.pages.length !== 1 ? "s" : ""}
                 </span>
               </div>
-
-              <div className="flex items-center gap-2">
-                <Heart size={16} />
-                <span>{document.stats?.likes ?? 0}</span>
-              </div>
-
-              <div>👁 {document.stats?.upvote ?? 0}</div>
             </div>
 
             <button className="rounded-full bg-emerald-700 px-6 py-3 font-semibold text-white transition hover:bg-emerald-800">

@@ -25,6 +25,7 @@ import {
 import { useParams } from "next/navigation";
 import useAuthStore from "@/data/authStore";
 import { IoLogOut } from "react-icons/io5";
+import api from "@/api-controllers/api";
 
 // Features for the left panel (verification/security theme)
 const features = [
@@ -103,6 +104,19 @@ export default function OtpVerificationPage() {
   const [canResend, setCanResend] = useState(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [userId, setUserId] = useState("");
+
+  const resendOtp = async () => {
+    if (isLoading) return;
+    setIsLoading(true);
+    try {
+      const response = await api.get(`/auth/resend-otp/${userId}`);
+      if (response.status !== 200) throw new Error("Failed to resend OTP");
+    } catch (error) {
+      setError("Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const router = useRouter();
 
@@ -187,8 +201,16 @@ export default function OtpVerificationPage() {
     }
   };
 
-  const handleResend = () => {
+  const handleResend = async () => {
     if (!canResend) return;
+    try {
+      const response = await api.get(`/auth/resend-otp/${userId}`);
+      if (response.status !== 200) throw new Error("Failed to resend OTP");
+    } catch (error) {
+      setError("Failed to resend OTP");
+    } finally {
+      setIsLoading(false);
+    }
     setCanResend(false);
     setResendTimer(30);
     // Call API to resend OTP

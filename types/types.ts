@@ -1,17 +1,15 @@
-//i am making this bcs i face circuler dependecy problem
-// file 1 contained types but file 2 used types but file 1 was importing file 2 and file 2 was importing file 1
-//
+// types.ts (or whatever you named this file)
 
 export enum PageType {
   Text = "text",
   TextWithMedia = "text-with-media",
-  // TextWithImage = "TextWithImage",
-  links = "links",
-  Quote = "Quote",
-  Collage = "Collage",
+  TextWithImage = "text-with-image", // <-- Uncommented and fixed
+  Links = "links", // PascalCase to match the rest
+  Quote = "quote",
+  Collage = "collage",
 }
 
-export type Page =
+type Page =
   | {
       pageId: string;
       type: PageType.Text;
@@ -27,11 +25,11 @@ export type Page =
   | { pageId: string; type: PageType.Collage; collage: string }
   | {
       pageId: string;
-      type: PageType.links;
+      type: PageType.Links;
       links?: string[];
     };
 
-export type CoreDocument = {
+type CoreDocument = {
   pages: Page[];
   id: string;
   title: string;
@@ -41,3 +39,6 @@ export type CoreDocument = {
   createdAt?: Date;
   category?: string[];
 };
+
+// Exporting everything clearly
+export type { CoreDocument, Page };

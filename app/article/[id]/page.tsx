@@ -3,7 +3,6 @@ import Page from "@/components/article-page";
 
 // import { collection } from "@/data/data";
 
-import { doc1 } from "@/data/data";
 import { useDocumentStore } from "@/store/documentStore";
 import { CoreDocument } from "@/types/types";
 import { useState, useEffect } from "react";

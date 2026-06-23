@@ -156,6 +156,13 @@ export default function SignupPage() {
 
     const result = await register({ name, email, password });
     // console.log("Signup ➡️", result);
+    console.log("❤️ registration data is ", result);
+    if (result.needsVerification) {
+      setError("User not verified");
+      setTimeout(() => {
+        router.push(`/verification/${result.userId}`);
+      }, 2000);
+    }
 
     if (result.success) {
       router.push(`/verification/${result.userId}`);
@@ -164,6 +171,10 @@ export default function SignupPage() {
       router.push(`/verification/${result.userId}`);
     } else {
       setError(result.data.error || "An unexpected error occurred");
+      if (result.user && !result.needsVerification) {
+        router.push(`/login`);
+      }
+      setIsLoading(false);
     }
   };
 

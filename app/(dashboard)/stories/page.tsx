@@ -44,15 +44,15 @@ function UnlistedArticles() {
     const fetchUnlistedArticles = async () => {
       const response = await api.get("/documents/unpublished/me");
       const data = response.data.documents;
-      console.log("Data is ", data);
+      console.log(" Published docs are   ", data);
       setData(data);
     };
     fetchUnlistedArticles();
   }, []);
   return (
-    (data && (
+    data && (
       <div>
-        {data.map((record, index) => (
+        {data.map((record: any, index: number) => (
           <div
             onClick={() => router.push(`/editor/?docId=${record.data.id}`)}
             key={index}
@@ -60,10 +60,6 @@ function UnlistedArticles() {
             <ArticleCard document={record.data}></ArticleCard>
           </div>
         ))}
-      </div>
-    )) || (
-      <div className="flex justify-center items-center h-screen w-full">
-        <NoDataAvailable data={unlistedMotivations}></NoDataAvailable>
       </div>
     )
   );
@@ -84,9 +80,10 @@ function PublishedArticles() {
         success: boolean;
         count: number;
         documents: Record<string, CoreDocument>;
+        data: any;
       } = await api.get("/documents/published/all");
-      const data = response.documents;
-      console.log(data);
+      const data = response.data.documents;
+      console.log("Published docs are ", data);
       setData(data);
     };
     fetchUnlistedArticles();

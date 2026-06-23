@@ -5,7 +5,7 @@ import NextButton from "@/components/page-turn-button";
 // FIX: Import types from the single source of truth (your store), not data.ts
 import { CoreDocument, Page, PageType } from "@/store/documentStore";
 
-import { AnimatePresence, motion, number } from "framer-motion"; // Cleaned up motion imports
+import { AnimatePresence, motion, number, Variant } from "framer-motion"; // Cleaned up motion imports
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
@@ -19,11 +19,12 @@ import { PlayIcon } from "@animateicons/react/lucide";
 
 import Dock from "@/components/Dock";
 import ComingSoonDialog from "@/components/ComingSoonDialog";
+import { Variants } from "framer-motion";
 
 // Removed local re-declarations of MediaItem, LinkItem, PageData, DocData
 // to rely entirely on the Zustand store types.
 
-const containerVariants = {
+const containerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -43,7 +44,7 @@ const containerVariants = {
   },
 };
 
-const wordVariants = {
+const wordVariants: Variants = {
   hidden: { opacity: 0, y: 10, filter: "blur(10px)", color: "#C2C8FF" },
   visible: {
     filter: "blur(0px)",
@@ -67,7 +68,7 @@ const wordVariants = {
   },
 };
 
-const imagesContainerVariants = {
+const imagesContainerVariants: Variants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
@@ -77,7 +78,7 @@ const imagesContainerVariants = {
   },
 };
 
-const imageItemVariants = {
+const imageItemVariants: Variants = {
   hidden: { opacity: 0, x: -200, filter: "blur(20px)" },
   visible: {
     opacity: 1,
@@ -234,13 +235,11 @@ export function PageContent(props: {
                   damping: 8,
                 },
               }}
-              onClick={() => router.push(link.url)}
+              onClick={() => router.push(link)}
               key={`${page.pageId}-${index}`}
             >
               {/* FIX: Use link.text or link.description based on your store type */}
-              <p className="px-4 text-center truncate">
-                {link.text || link.description}
-              </p>
+              <p className="px-4 text-center truncate">{link || link}</p>
             </motion.div>
           ))}
         </motion.div>
@@ -256,7 +255,7 @@ export function PageContent(props: {
 }
 
 function TextWithMedia(props: {
-  data: Page & { media?: Media[] };
+  data: Page & { media?: any[] };
   onNext: () => void;
   index?: number;
 }) {
@@ -334,7 +333,7 @@ function TextWithMedia(props: {
       <div className="w-full md:w-1/2 h-1/2 md:h-full flex justify-center items-center px-4 overflow-hidden relative">
         <TextRenderer
           onAnimationComplete={() => setTextDone(true)}
-          text={page.text || ""}
+          text={"text" in page ? page.text : ""}
           index={props.index}
         />
       </div>

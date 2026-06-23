@@ -9,7 +9,7 @@ import { error } from "node:console";
 export enum PageType {
   Text = "text",
   TextWithMedia = "text-with-media",
-  links = "links",
+  Links = "links",
   Quote = "Quote",
   Collage = "Collage",
 }
@@ -24,7 +24,7 @@ export type Page =
     }
   | { pageId: string; type: PageType.Quote; quote: string }
   | { pageId: string; type: PageType.Collage; collage: string }
-  | { pageId: string; type: PageType.links; links?: string[] };
+  | { pageId: string; type: PageType.Links; links?: string[] };
 
 export type CoreDocument = {
   id: string; // Added ID for store management
@@ -108,7 +108,7 @@ export const useDocumentStore = create<DocumentStore>()(
           }));
 
           return true;
-        } catch (e) {
+        } catch (e: any) {
           console.error(e);
           return false;
         }
@@ -130,7 +130,7 @@ export const useDocumentStore = create<DocumentStore>()(
           }));
 
           return true;
-        } catch (e) {
+        } catch (e: any) {
           if (e.response?.status === 404) {
             return false;
           }

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useState, useCallback, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useRef,
+  useEffect,
+  Suspense,
+} from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -19,10 +25,14 @@ import {
 } from "lucide-react";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { useDocumentStore, PageType } from "@/store/documentStore";
+
 import { GrSync } from "react-icons/gr";
-import Page from "@/components/article-page";
 
 import api from "@/api-controllers/api";
+import type { Page as CorePage } from "@/store/documentStore";
+
+import Page from "@/components/article-page";
+
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
@@ -140,7 +150,8 @@ function ConfirmModal({
   );
 }
 
-export default function DocumentEditor() {
+// 1. Rename the main component to separate it from the default export
+function DocumentEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const docId = searchParams.get("docId");
@@ -313,39 +324,41 @@ export default function DocumentEditor() {
     [currentDoc, showToast],
   );
 
-  const renderThumbContent = (page: Page) => {
-    if (page.type === PageType.Text || page.type === PageType.TextWithMedia) {
-      const text = page.text || "";
-      if (!text) {
+  const renderThumbContent = (page: CorePage) => {
+    if ("text" in page) {
+      if (page.type === PageType.Text || page.type === PageType.TextWithMedia) {
+        const text = page.text || "";
+        if (!text) {
+          return (
+            <div className="flex flex-col items-center justify-center h-full gap-1 opacity-30">
+              <AlignLeft size={14} />
+              <span className="text-[7px] font-medium">Empty</span>
+            </div>
+          );
+        }
+        const lines = text.split("\n");
         return (
-          <div className="flex flex-col items-center justify-center h-full gap-1 opacity-30">
-            <AlignLeft size={14} />
-            <span className="text-[7px] font-medium">Empty</span>
+          <div className="space-y-[3px] px-1 mt-1">
+            {lines.slice(0, 5).map((line, li) => (
+              <div key={li} className="flex gap-[2px] items-center">
+                {line.length === 0 ? (
+                  <div className="h-[3px] w-4 bg-[#E8E8ED] rounded-full" />
+                ) : (
+                  <div
+                    className="h-[3px] rounded-full bg-[#1D1D1F]/20"
+                    style={{
+                      width: `${Math.min(95, Math.max(20, (line.length / 60) * 100))}%`,
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+            {lines.length > 5 && (
+              <div className="h-[3px] w-6 bg-[#1D1D1F]/10 rounded-full" />
+            )}
           </div>
         );
       }
-      const lines = text.split("\n");
-      return (
-        <div className="space-y-[3px] px-1 mt-1">
-          {lines.slice(0, 5).map((line, li) => (
-            <div key={li} className="flex gap-[2px] items-center">
-              {line.length === 0 ? (
-                <div className="h-[3px] w-4 bg-[#E8E8ED] rounded-full" />
-              ) : (
-                <div
-                  className="h-[3px] rounded-full bg-[#1D1D1F]/20"
-                  style={{
-                    width: `${Math.min(95, Math.max(20, (line.length / 60) * 100))}%`,
-                  }}
-                />
-              )}
-            </div>
-          ))}
-          {lines.length > 5 && (
-            <div className="h-[3px] w-6 bg-[#1D1D1F]/10 rounded-full" />
-          )}
-        </div>
-      );
     }
     return null;
   };
@@ -642,7 +655,7 @@ export default function DocumentEditor() {
                   style={{
                     boxShadow:
                       "0 0 0 1px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.08)",
-                    backgroundColor: activePage.backgroundColor || "#fff",
+                    backgroundColor: "#fff",
                   }}
                 >
                   <div className="flex-shrink-0 flex items-center justify-between px-7 pt-5 pb-1">
@@ -688,6 +701,21 @@ export default function DocumentEditor() {
         onCancel={() => setDeleteTarget(null)}
       />
     </div>
+  );
+}
+
+// 2. Export the default component that wraps the content in Suspense
+export default function DocumentEditor() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-screen items-center justify-center bg-[#E8E8ED]">
+          <div className="w-6 h-6 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin" />
+        </div>
+      }
+    >
+      <DocumentEditorContent />
+    </Suspense>
   );
 }
 
