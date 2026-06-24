@@ -32,9 +32,9 @@ export default function Article({
     const fetchData = async () => {
       if (id) {
         const response = await api.get(`/articles/${id}`);
-        const data = response;
+        const data = response.data.document.data;
         console.log("data👌", data);
-        setData(data.data.document);
+        setData(data);
       }
     };
     fetchData();

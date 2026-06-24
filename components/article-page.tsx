@@ -96,7 +96,7 @@ export default function PageViewer(props: {
   text?: string;
 }) {
   const router = useRouter();
-  const data = props.data.data;
+  const data = props.data;
   const pages = data.pages;
   console.log("👊🎁 🇮🇳", data);
 

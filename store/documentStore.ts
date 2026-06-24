@@ -116,7 +116,8 @@ export const useDocumentStore = create<DocumentStore>()(
       getDocumentFromServer: async (id: string) => {
         try {
           const response = await api.get(`/documents/${id}/`);
-          const doc = response.data;
+          const doc = response.data.document.data;
+          // console.log("getDocumentFromServer", doc.data);
           if (!doc) return false;
 
           set((state) => ({

@@ -32,6 +32,8 @@ import api from "@/api-controllers/api";
 import type { Page as CorePage } from "@/store/documentStore";
 
 import Page from "@/components/article-page";
+import { SiDocsdotrs } from "react-icons/si";
+import { title } from "motion/react-m";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -207,6 +209,7 @@ function DocumentEditorContent() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const currentDoc = docId ? documents[docId] : null;
+  console.log("Current docs is =", currentDoc);
 
   useEffect(() => {
     if (!docId) return;
@@ -215,8 +218,10 @@ function DocumentEditorContent() {
       setSynced(false);
 
       const doc = await getDocumentFromServer(docId);
+      console.log(doc);
 
       if (doc) {
+        // documents[docId] = doc;
         setIsSyncing(false);
         setSynced(true);
       }
@@ -272,7 +277,7 @@ function DocumentEditorContent() {
       }, 120);
     }
   }, [docId, addPage, currentDoc]);
-
+  console.log("currentDoc", currentDoc);
   const confirmDelete = useCallback(() => {
     if (!deleteTarget || !docId || !currentDoc) return;
     if (currentDoc.pages.length <= 1) {
@@ -385,6 +390,8 @@ function DocumentEditorContent() {
         handlePublishPopup={handlePublish}
         isVisible={showPublishForm}
         document_id={docId}
+        title={currentDoc.title}
+        thumbnail={currentDoc.thumbnailUrl ?? undefined}
       ></PublishForm>
       {/* LEFT SIDEBAR */}
       <div className="w-[272px] min-w-[272px] flex flex-col bg-[#F5F5F7] border-r border-[#D2D2D7]/50 select-none">
@@ -723,10 +730,17 @@ export const PublishForm = (props: {
   handlePublishPopup: () => void;
   isVisible: boolean;
   document_id: string | null;
+  title: string;
+  thumbnail?: string;
 }) => {
   const publish = async () => {
     await api
-      .post(`/documents/${props.document_id}/publish`)
+      .post(`/documents/${props.document_id}/publish`, {
+        title: props.title,
+        thumbnail:
+          props.thumbnail ??
+          "https://cdn.pixabay.com/photo/2022/08/09/19/55/boho-art-7375748_1280.jpg",
+      })
       .then((res) => {
         Toast({ message: "Document published successfully", visible: true });
       })

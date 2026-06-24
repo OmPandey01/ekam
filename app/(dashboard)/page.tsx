@@ -13,6 +13,12 @@ import Image from "next/image";
 export default function Home() {
   const router = useRouter();
   const [collection, setCollection] = useState<any[]>([]);
+  const thumbnailUrls: string[] = [
+    "/thumbnails/thumbnail_1.jpg",
+    "/thumbnails/thumbnail_2.jpg",
+  ];
+
+  const [thumbnailIndex, setThumbnailIndex] = useState(0);
 
   // Note: state.documents is available here if you need it locally later
   const documents = useDocumentStore((state) => state.documents);
@@ -30,15 +36,22 @@ export default function Home() {
       );
     };
 
+    const getThumbnailUrl = (): string => {
+      setThumbnailIndex((prevIndex) => (prevIndex + 1) % thumbnailUrls.length);
+      return thumbnailUrls[thumbnailIndex];
+    };
+
     const fetchData = async () => {
       try {
         const response = await api.get("articles/published/featured");
-        console.log("Response from server:", response);
+        // console.log("Response from server:", response);
 
         const data = response.data?.feed || [];
 
+        console.log(data[[0]]);
+
         setCollection(data);
-        console.log("Document array processed:", data);
+        // console.log("Document array processed:", data);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -63,29 +76,20 @@ export default function Home() {
                 entry.thumbnail && entry.thumbnail !== "null";
 
               return (
-                <li key={entry.key} className="list-none">
+                <li key={entry.document_id} className="list-none">
                   <motion.div
                     whileHover={{ y: -4 }}
                     className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row w-full  h-auto md:h-28"
                   >
                     {/* Thumbnail / Gradient Container */}
                     <div className="w-full md:w-48 h-22 md:h-full flex-shrink-0">
-                      {hasThumbnail ? (
-                        <Image
-                          src={entry.thumbnail}
-                          alt={entry.title}
-                          className="w-full h-full object-cover"
-                          width={hasThumbnail ? 48 : undefined}
-                          height={hasThumbnail ? 32 : undefined}
-                        />
-                      ) : (
-                        // Modern, vibrant color gradient placeholder
-                        <div className="w-full h-full bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center p-4">
-                          <span className="text-white/20 font-black text-6xl tracking-tighter select-none">
-                            {entry.title?.charAt(0).toUpperCase() || "A"}
-                          </span>
-                        </div>
-                      )}
+                      <Image
+                        src={thumbnailUrls[0]}
+                        alt={entry.title}
+                        className="w-full h-full object-cover"
+                        width={200}
+                        height={200}
+                      />
                     </div>
 
                     {/* Content Container */}
