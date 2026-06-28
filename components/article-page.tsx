@@ -98,7 +98,7 @@ export default function PageViewer(props: {
   const router = useRouter();
   const data = props.data;
   const pages = data.pages;
-  console.log("👊🎁 🇮🇳", data);
+  // console.log("👊🎁 🇮🇳", data);
 
   const [index, setIndex] = useState(props.index ?? 0);
 
@@ -121,12 +121,12 @@ export default function PageViewer(props: {
       className: "!bg-green-200  !border-gray-200 !text-black",
       onClick: handlePrev,
     },
-    {
-      icon: <StarIcon size={30} duration={1.05} color="black" />,
-      label: "Star the page",
-      className: "!bg-amber-50 !border-gray-200 !text-black",
-      onClick: handleComingSoonPopup,
-    },
+    // {
+    //   icon: <StarIcon size={30} duration={1.05} color="black" />,
+    //   label: "Star the page",
+    //   className: "!bg-amber-50 !border-gray-200 !text-black",
+    //   onClick: handleComingSoonPopup,
+    // },
     {
       icon: <ShareIcon size={30} duration={1.05} color="black" />,
       label: "Share the page",
@@ -139,12 +139,12 @@ export default function PageViewer(props: {
       className: "!bg-green-50 !border-gray-200 !text-black",
       onClick: () => router.push("/"),
     },
-    {
-      icon: <PlayIcon size={30} duration={1.05} color="black" />,
-      label: "Start as slideshow",
-      className: "!bg-green-50 !border-gray-200 !text-black",
-      onClick: handleComingSoonPopup,
-    },
+    // {
+    //   icon: <PlayIcon size={30} duration={1.05} color="black" />,
+    //   label: "Start as slideshow",
+    //   className: "!bg-green-50 !border-gray-200 !text-black",
+    //   onClick: handleComingSoonPopup,
+    // },
     {
       icon: <ImFontSize />,
       label: "Change Font Size",
@@ -164,15 +164,15 @@ export default function PageViewer(props: {
 
   return (
     <div
-      className={`bg-linear-to-r from-green-50 to-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-6 overflow-hidden`}
+      className={`rounded-3xl  bg-sky-300 dark:bg-black w-full h-full flex flex-col justify-center items-center overflow-hidden`}
     >
       <AnimatePresence mode="wait">
         <motion.div
           key={page.pageId} // Uses pageId (camelCase)
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.5 } }}
-          className="w-full h-full flex justify-center items-center absolute"
+          exit={{ transition: { duration: 0.5 } }}
+          className="absolute inset-0 w-full h-full flex flex-col items-center justify-center "
         >
           <PageContent page={page} onNext={handleNext} onPrev={handlePrev} />
           <ComingSoonDialog
@@ -211,43 +211,14 @@ export function PageContent(props: {
             onAnimationComplete={() => {}}
             text={page.text || ""}
             index={page.pageId}
+            size={7}
           />
         </div>
       );
 
-    case PageType.Links:
-    case "links":
-      return (
-        <motion.div
-          key={page.pageId}
-          className={`font-playwrite bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col justify-center items-center px-4`}
-        >
-          {page.links?.map((link, index) => (
-            <motion.div
-              className="h-12 w-full max-w-xs rounded-3xl bg-blue-200 m-4 flex justify-center items-center cursor-pointer"
-              whileHover={{ scale: 1.5, backgroundColor: "lightBlue" }}
-              initial={{ scale: 0 }}
-              animate={{
-                scale: 1,
-                transition: {
-                  type: "spring" as const,
-                  stiffness: 100,
-                  damping: 8,
-                },
-              }}
-              onClick={() => router.push(link)}
-              key={`${page.pageId}-${index}`}
-            >
-              {/* FIX: Use link.text or link.description based on your store type */}
-              <p className="px-4 text-center truncate">{link || link}</p>
-            </motion.div>
-          ))}
-        </motion.div>
-      );
-
-    case PageType.TextWithMedia:
-    case "text-with-media":
-      return <TextWithMedia data={page as any} onNext={props.onNext} />;
+    // case PageType.TextWithMedia:
+    // case "text-with-media":
+    //   return <TextWithMedia data={page as any} onNext={props.onNext} />;
 
     default:
       return <p>{"Got Error: Unknown type " + page.type}</p>;
@@ -286,9 +257,9 @@ function TextWithMedia(props: {
   return (
     <motion.div
       key={page.pageId}
-      className="bg-yellow-50 dark:bg-black w-screen h-screen flex flex-col md:flex-row justify-center items-center relative overflow-hidden"
+      className=" dark:bg-black w-screen h-screen flex flex-col md:flex-row justify-center items-center relative overflow-hidden"
     >
-      <div className="w-full md:w-1/2 h-1/2 md:h-full flex flex-row justify-center items-center relative p-4 md:p-8 shrink-0">
+      <div className=" bg-amber-600w-full md:w-1/2 h-1/2 md:h-full flex flex-row justify-center items-center relative p-4 md:p-8 shrink-0">
         {page.media && page.media.length > 0 && (
           <>
             <button
@@ -334,6 +305,7 @@ function TextWithMedia(props: {
         <TextRenderer
           onAnimationComplete={() => setTextDone(true)}
           text={"text" in page ? page.text : ""}
+          size={6}
           index={props.index}
         />
       </div>
@@ -366,12 +338,22 @@ export function TextRenderer(props: {
 
   index?: number | string; // Updated to accept string pageId
   onAnimationComplete?: () => void;
-  size?: "sm" | "md" | "lg";
+  size: number;
   height?: number;
 }) {
   const uniqueKey =
     props.index !== undefined ? props.index : props.text.substring(0, 2);
   const tokens = props.text.match(/\S+|\n/g) || [];
+  const sizeClass: Record<number, string> = {
+    1: "text-xs",
+    2: "text-sm",
+    3: "text-base",
+    4: "text-lg",
+    5: "text-xl",
+    6: "text-2xl",
+    7: "text-3xl",
+    8: "text-4xl",
+  };
 
   return (
     <AnimatePresence mode="wait">
@@ -396,13 +378,7 @@ export function TextRenderer(props: {
               <motion.p
                 variants={wordVariants}
                 style={props.height ? { height: `${props.height}px` } : {}}
-                className={`text-2xl sm:text-3xl md:text-4xl mx-1 my-0.5 ${
-                  props.size === "sm"
-                    ? "text-sm"
-                    : props.size === "md"
-                      ? "text-md"
-                      : "text-lg"
-                }`}
+                className={`${sizeClass[props.size + 1] || "text-3xl"}  mx-1 my-0.5`}
                 key={`${uniqueKey}-${index}`}
               >
                 {token}

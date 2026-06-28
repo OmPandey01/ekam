@@ -30,7 +30,7 @@ export default function ComingSoonDialog({
         <AlertDialogHeader>
           <AlertDialogTitle>Coming Soon!</AlertDialogTitle>
           <AlertDialogDescription>
-            <p className="text-black font-bold text-2xl"> {text} </p>
+            <span className="text-black font-bold text-2xl"> {text} </span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

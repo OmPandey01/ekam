@@ -17,7 +17,7 @@ export default function IntervalText(props: { data: string[] }) {
 
   return (
     <div>
-      <TextRenderer size={"md"} text={props.data[index]} index={index} />
+      <TextRenderer size={6} text={props.data[index]} index={index} />
     </div>
   );
 }

@@ -22,6 +22,8 @@ import {
   ChevronLeft,
   FileText,
   UploadCloudIcon,
+  Globe,
+  Loader2,
 } from "lucide-react";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { useDocumentStore, PageType } from "@/store/documentStore";
@@ -32,8 +34,8 @@ import api from "@/api-controllers/api";
 import type { Page as CorePage } from "@/store/documentStore";
 
 import Page from "@/components/article-page";
+import ImageDropZone from "@/components/ImageDropZone"; // Imported ImageDropZone
 import { SiDocsdotrs } from "react-icons/si";
-import { title } from "motion/react-m";
 
 const jakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
@@ -152,7 +154,6 @@ function ConfirmModal({
   );
 }
 
-// 1. Rename the main component to separate it from the default export
 function DocumentEditorContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -182,12 +183,27 @@ function DocumentEditorContent() {
   const [showPublishForm, setShowPublishForm] = useState(false);
   const [showPreview, setShowPreview] = useState<boolean>(false);
 
-  const tooglePreview = () => {
+  // Added state for thumbnailUrl in the parent component
+  const [thumbnailUrl, setThumbnailUrl] = useState<string>("");
+
+  const togglePreview = () => {
     setShowPreview(!showPreview);
   };
+
   const handlePublish = () => {
+    // Pre-fill the thumbnail state when opening the publish form
+    if (currentDoc?.thumbnailUrl) {
+      setThumbnailUrl(currentDoc.thumbnailUrl);
+    } else {
+      setThumbnailUrl("");
+    }
     setShowPublishForm(!showPublishForm);
   };
+
+  const showToast = useCallback((message: string) => {
+    setToast({ message, visible: true });
+    setTimeout(() => setToast((p) => ({ ...p, visible: false })), 2600);
+  }, []);
 
   const handleSync = useCallback(async () => {
     setToast({ message: "Syncing...", visible: true });
@@ -201,7 +217,7 @@ function DocumentEditorContent() {
       setSynced(false);
       setToast({ message: "Failed to sync with server", visible: true });
     }
-    setToast({ message: "", visible: false });
+    setTimeout(() => setToast({ message: "", visible: false }), 1000);
     setIsSyncing(false);
   }, [docId, syncWithServer]);
 
@@ -209,19 +225,14 @@ function DocumentEditorContent() {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const currentDoc = docId ? documents[docId] : null;
-  console.log("Current docs is =", currentDoc);
 
   useEffect(() => {
     if (!docId) return;
     const getDoc = async () => {
       setIsSyncing(true);
       setSynced(false);
-
       const doc = await getDocumentFromServer(docId);
-      console.log(doc);
-
       if (doc) {
-        // documents[docId] = doc;
         setIsSyncing(false);
         setSynced(true);
       }
@@ -234,14 +245,11 @@ function DocumentEditorContent() {
       await handleSync();
     }, 10000);
     return () => clearInterval(syncInterval);
-  }, []);
+  }, [handleSync]);
 
   useEffect(() => {
     if (!isHydrated) return;
-    if (!docId) {
-      const newId = createDocument();
-      router.replace(`/editor?docId=${newId}`);
-    } else if (!currentDoc) {
+    if (!docId || !currentDoc) {
       const newId = createDocument();
       router.replace(`/editor?docId=${newId}`);
     }
@@ -258,11 +266,6 @@ function DocumentEditorContent() {
     }
   }, [currentDoc, activePageIndex]);
 
-  const showToast = useCallback((message: string) => {
-    setToast({ message, visible: true });
-    setTimeout(() => setToast((p) => ({ ...p, visible: false })), 2600);
-  }, []);
-
   const handleAddPage = useCallback(() => {
     if (!docId) return;
     addPage(docId);
@@ -277,7 +280,7 @@ function DocumentEditorContent() {
       }, 120);
     }
   }, [docId, addPage, currentDoc]);
-  console.log("currentDoc", currentDoc);
+
   const confirmDelete = useCallback(() => {
     if (!deleteTarget || !docId || !currentDoc) return;
     if (currentDoc.pages.length <= 1) {
@@ -318,17 +321,6 @@ function DocumentEditorContent() {
     [saveTitle, cancelEditTitle],
   );
 
-  const saveDocument = useCallback(
-    (e: React.MouseEvent) => {
-      if (!currentDoc) return;
-      console.log("CoreDocument JSON:", JSON.stringify(currentDoc, null, 2));
-      setSaveFlash(true);
-      showToast("Progress saved");
-      setTimeout(() => setSaveFlash(false), 600);
-    },
-    [currentDoc, showToast],
-  );
-
   const renderThumbContent = (page: CorePage) => {
     if ("text" in page) {
       if (page.type === PageType.Text || page.type === PageType.TextWithMedia) {
@@ -358,9 +350,6 @@ function DocumentEditorContent() {
                 )}
               </div>
             ))}
-            {lines.length > 5 && (
-              <div className="h-[3px] w-6 bg-[#1D1D1F]/10 rounded-full" />
-            )}
           </div>
         );
       }
@@ -391,8 +380,11 @@ function DocumentEditorContent() {
         isVisible={showPublishForm}
         document_id={docId}
         title={currentDoc.title}
-        thumbnail={currentDoc.thumbnailUrl ?? undefined}
-      ></PublishForm>
+        thumbnailUrl={thumbnailUrl}
+        setThumbnailUrl={setThumbnailUrl}
+        onSuccess={(msg) => showToast(msg)}
+      />
+
       {/* LEFT SIDEBAR */}
       <div className="w-[272px] min-w-[272px] flex flex-col bg-[#F5F5F7] border-r border-[#D2D2D7]/50 select-none">
         <div className="flex items-center justify-between px-4 py-3 border-b border-[#D2D2D7]/40 bg-[#FAFAFA]/70 backdrop-blur-md">
@@ -487,17 +479,6 @@ function DocumentEditorContent() {
                       </motion.button>
                     )}
                   </AnimatePresence>
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeGlow"
-                      className="absolute -inset-[1px] rounded-xl bg-[#007AFF]/5 pointer-events-none"
-                      transition={{
-                        type: "spring",
-                        damping: 25,
-                        stiffness: 300,
-                      }}
-                    />
-                  )}
                 </motion.div>
               );
             })}
@@ -519,7 +500,7 @@ function DocumentEditorContent() {
 
       {/* RIGHT AREA */}
       <div className="flex-1 flex flex-col min-w-0">
-        <div className="flex items-center justify-between px-8 py-4  bg-[#F5F5F7]/60 border-b border-[#D2D2D7]/30 backdrop-blur-md">
+        <div className="flex items-center justify-between px-8 py-4 bg-[#F5F5F7]/60 border-b border-[#D2D2D7]/30 backdrop-blur-md">
           <div className="flex items-center gap-3 min-w-0">
             <AnimatePresence mode="wait">
               {isEditingTitle ? (
@@ -537,20 +518,20 @@ function DocumentEditorContent() {
                     value={titleDraft}
                     onChange={(e) => setTitleDraft(e.target.value)}
                     onKeyDown={handleTitleKey}
-                    className="text-[20px] font-bold text-[#1D1D1F] bg-white border-2 border-[#007AFF] rounded-lg px-3 py-1 focus:outline-none focus:ring-4 focus:ring-[#007AFF]/15 min-w-[240px] placeholder:text-[#C7C7CC]"
+                    className="text-[15px] font-semibold text-[#1D1D1F] bg-white border border-[#D2D2D7] rounded-lg px-3 py-1.5 focus:outline-none focus:border-[#007AFF] min-w-[240px]"
                     placeholder="Document title"
                   />
                   <button
                     onClick={saveTitle}
-                    className="p-2 rounded-lg bg-[#007AFF] text-white hover:bg-[#0062D9] transition-colors shadow-sm"
+                    className="p-2 rounded-lg bg-[#007AFF] text-white hover:bg-[#0062D9] transition-colors"
                   >
-                    <Check size={15} />
+                    <Check size={14} />
                   </button>
                   <button
                     onClick={cancelEditTitle}
-                    className="p-2 rounded-lg bg-[#E8E8ED] text-[#86868B] hover:bg-[#D2D2D7] transition-colors"
+                    className="p-2 rounded-lg bg-[#E8E8ED] text-[#86868B] transition-colors"
                   >
-                    <X size={15} />
+                    <X size={14} />
                   </button>
                 </motion.div>
               ) : (
@@ -562,139 +543,106 @@ function DocumentEditorContent() {
                   transition={{ duration: 0.18 }}
                   className="flex items-center gap-2.5"
                 >
-                  <h1 className="text-[20px] font-bold text-[#1D1D1F] truncate max-w-[500px]">
+                  <h1 className="text-[16px] font-bold text-[#1D1D1F] truncate max-w-[320px]">
                     {currentDoc.title}
                   </h1>
                   <button
                     onClick={startEditingTitle}
-                    className="p-1.5 rounded-lg text-[#86868B] hover:text-[#007AFF] hover:bg-[#007AFF]/10 transition-all active:scale-90"
-                    title="Edit title"
+                    className="p-1.5 rounded-lg text-[#86868B] hover:text-[#007AFF] hover:bg-[#007AFF]/10 transition-all"
                   >
-                    <Pencil size={13} />
+                    <Pencil size={12} />
                   </button>
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
-          <motion.div className="bg-white w-40 flex justify-between h-10 rounded-[10px]">
-            <motion.button
+
+          <div className="flex items-center gap-4 bg-white/80 backdrop-blur-sm border border-[#D2D2D7]/60 p-1 rounded-xl">
+            <button
               onClick={() => setShowPreview(false)}
-              className={`${!showPreview ? "bg-blue-400" : " "} w-40 h-full rounded-l-[10px]`}
+              className={`px-4 py-1.5 text-[13px] font-medium rounded-lg transition-all ${!showPreview ? "bg-[#007AFF] text-white shadow-sm" : "text-[#86868B] hover:text-[#1D1D1F]"}`}
             >
               Editor
-            </motion.button>
-            <motion.button
+            </button>
+            <button
               onClick={() => setShowPreview(true)}
-              className={`${showPreview ? "bg-blue-400" : " "} w-40 rounded-r-[10px]`}
+              className={`px-4 py-1.5 text-[13px] font-medium rounded-lg transition-all ${showPreview ? "bg-[#007AFF] text-white shadow-sm" : "text-[#86868B] hover:text-[#1D1D1F]"}`}
             >
               Preview
-            </motion.button>
-          </motion.div>
+            </button>
+          </div>
 
-          <div className="flex   items-center gap-2 text-[12px] text-[#86868B] font-medium shrink-0">
-            <FileText size={13} />
-            <span className="tabular-nums">
+          <div className="flex items-center gap-4 text-[12px] text-[#86868B] font-medium shrink-0">
+            <span className="tabular-nums flex items-center gap-1.5">
+              <FileText size={13} />
               Page {activePageIndex + 1} of {currentDoc.pages.length}
             </span>
 
             <motion.button
               onClick={handlePublish}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="p-1.5 h-10 w-20 bg-blue-500  rounded-lg text-black hover:text-[#007AFF] hover:bg-[#007AFF]/10 transition-all active:scale-90"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="px-4 py-2 bg-[#1D1D1F] hover:bg-[#323236] text-white text-[13px] font-semibold rounded-xl transition-colors shadow-sm flex items-center gap-1.5"
             >
+              <Globe size={13} />
               Publish
             </motion.button>
           </div>
         </div>
 
         <div
-          className="flex-1 flex bg-lime-50 items-center justify-center p-6 md:p-10 overflow-auto relative"
+          className="flex-1 flex bg-[#E8E8ED] items-center justify-center p-6 md:p-10 overflow-auto relative"
           style={{
             backgroundImage:
               "radial-gradient(circle, #C7C7CC 0.5px, transparent 0.5px)",
             backgroundSize: "20px 20px",
           }}
         >
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              width: "500px",
-              height: "500px",
-              backgroundColor: "lightyellow",
-              top: "10%",
-              right: "5%",
-              background:
-                "radial-gradient(circle, rgba(0,122,255,0.06) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
-          />
-          <div
-            className="absolute pointer-events-none"
-            style={{
-              width: "400px",
-              height: "400px",
-
-              backgroundColor: "lightgreen",
-              bottom: "5%",
-              left: "10%",
-              background:
-                "radial-gradient(circle, rgba(88,86,214,0.05) 0%, transparent 70%)",
-              filter: "blur(60px)",
-            }}
-          />
-
           <AnimatePresence mode="wait">
-            {!showPreview &&
-              (activePage.type === PageType.Text ||
-                activePage.type === PageType.TextWithMedia) && (
-                <motion.div
-                  key={activePage.pageId}
-                  variants={slideVariants}
-                  initial="initial"
-                  animate="animate"
-                  exit="exit"
-                  transition={{
-                    duration: 0.28,
-                    ease: [0.25, 0.46, 0.45, 0.94],
-                  }}
-                  className="w-full max-w-[920px] aspect-[16/9] bg-white rounded-2xl flex flex-col overflow-hidden relative"
-                  style={{
-                    boxShadow:
-                      "0 0 0 1px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.04), 0 12px 40px rgba(0,0,0,0.08)",
-                    backgroundColor: "#fff",
-                  }}
-                >
-                  <div className="flex-shrink-0 flex items-center justify-between px-7 pt-5 pb-1">
-                    <div className="flex items-center gap-2 bg-[#F5F5F7] rounded-lg px-3 py-[5px]">
-                      <Type size={12} className="text-[#86868B]" />
-                      <span className="text-[11px] text-[#86868B] font-semibold">
-                        {getPageTypeLabel(activePage.type)} Page
-                      </span>
-                    </div>
-                    <span className="text-[11px] text-[#C7C7CC] font-medium tabular-nums">
-                      {activePageIndex + 1}
+            {!showPreview ? (
+              <motion.div
+                key={activePage.pageId}
+                variants={slideVariants}
+                initial="initial"
+                animate="animate"
+                exit="exit"
+                transition={{ duration: 0.24 }}
+                className="w-full max-w-[920px] aspect-[16/9] bg-white rounded-2xl flex flex-col overflow-hidden relative shadow-xl border border-[#D2D2D7]/40"
+              >
+                <div className="flex-shrink-0 flex items-center justify-between px-7 pt-5 pb-1">
+                  <div className="flex items-center gap-2 bg-[#F5F5F7] rounded-lg px-3 py-[5px]">
+                    <Type size={12} className="text-[#86868B]" />
+                    <span className="text-[11px] text-[#86868B] font-semibold">
+                      {getPageTypeLabel(activePage.type)} Page
                     </span>
                   </div>
+                  <span className="text-[11px] text-[#C7C7CC] font-medium tabular-nums">
+                    {activePageIndex + 1}
+                  </span>
+                </div>
 
-                  <div className="flex-1 px-7 pb-7 pt-2 min-h-0">
-                    <textarea
-                      value={activePage.text || ""}
-                      onChange={(e) =>
-                        docId &&
-                        updatePageText(docId, activePage.pageId, e.target.value)
-                      }
-                      className="w-full h-full text-[17px] leading-[1.75] bg-transparent resize-none focus:outline-none text-[#1D1D1F] placeholder:text-[#C7C7CC]/80 font-medium"
-                      placeholder="Start writing something remarkable..."
-                      spellCheck
-                    />
-                  </div>
-                  <div className="h-[3px] bg-gradient-to-r from-transparent via-[#007AFF]/20 to-transparent flex-shrink-0" />
-                </motion.div>
-              )}
-            {showPreview && (
-              <motion.div>
-                <Page data={currentDoc} title="Here is the title" />
+                <div className="flex-1 px-7 pb-7 pt-2 min-h-0">
+                  <textarea
+                    value={activePage.text || ""}
+                    onChange={(e) =>
+                      docId &&
+                      updatePageText(docId, activePage.pageId, e.target.value)
+                    }
+                    className="w-full h-full text-[16px] leading-[1.75] bg-transparent resize-none focus:outline-none text-[#1D1D1F] placeholder:text-[#C7C7CC]/80 font-medium"
+                    placeholder="Start writing something remarkable..."
+                    spellCheck
+                  />
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="preview-pane"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className=" h-full w-full"
+              >
+                <Page data={currentDoc} title={currentDoc.title} />
               </motion.div>
             )}
           </AnimatePresence>
@@ -711,7 +659,6 @@ function DocumentEditorContent() {
   );
 }
 
-// 2. Export the default component that wraps the content in Suspense
 export default function DocumentEditor() {
   return (
     <Suspense
@@ -726,48 +673,187 @@ export default function DocumentEditor() {
   );
 }
 
-export const PublishForm = (props: {
+interface PublishFormProps {
   handlePublishPopup: () => void;
   isVisible: boolean;
   document_id: string | null;
   title: string;
-  thumbnail?: string;
-}) => {
-  const publish = async () => {
-    await api
-      .post(`/documents/${props.document_id}/publish`, {
-        title: props.title,
-        thumbnail:
-          props.thumbnail ??
-          "https://cdn.pixabay.com/photo/2022/08/09/19/55/boho-art-7375748_1280.jpg",
-      })
-      .then((res) => {
-        Toast({ message: "Document published successfully", visible: true });
-      })
-      .catch((err) => {
-        Toast({ message: "Failed to publish document", visible: true });
-        if (err.response.status === 400) {
-          console.log("Failed to publish document", err.response.data);
-        }
+  thumbnailUrl: string;
+  setThumbnailUrl: (url: string) => void;
+  onSuccess: (message: string) => void;
+}
+
+export const PublishForm = ({
+  handlePublishPopup,
+  isVisible,
+  document_id,
+  title,
+  thumbnailUrl,
+  setThumbnailUrl,
+  onSuccess,
+}: PublishFormProps) => {
+  const [publishTitle, setPublishTitle] = useState(title);
+  const [categoriesStr, setCategoriesStr] = useState("");
+  const [isPublishing, setIsPublishing] = useState(false);
+
+  useEffect(() => {
+    if (isVisible) {
+      setPublishTitle(title);
+      setCategoriesStr("");
+    }
+  }, [isVisible, title]);
+
+  const defaultImages = [
+    "https://res.cloudinary.com/dtw828to0/image/upload/v1782412343/thumbnail_1_zkx6sr.jpg",
+    "https://cdn.pixabay.com/photo/2025/06/26/04/12/hill-9681095_1280.jpg",
+    "https://res.cloudinary.com/dtw828to0/image/upload/v1782434053/milaoktasafitri-hill-9026381_640_hnerje.png",
+    "https://cdn.pixabay.com/photo/2025/10/27/15/30/lighthouse-9920690_1280.png"
+  ];
+
+  const handlePublishSubmit = async () => {
+    if (!document_id) return;
+    setIsPublishing(true);
+
+    try {
+      const finalThumbnail = thumbnailUrl || defaultImages[Math.floor(Math.random() * defaultImages.length)];
+
+      const categoriesArray = categoriesStr
+        .split(",")
+        .map(c => c.trim())
+        .filter(c => c.length > 0);
+
+      await api.post(`/documents/${document_id}/publish`, {
+        title: publishTitle.trim() || "Untitled Production Document",
+        thumbnailUrl: finalThumbnail,
+        categories: categoriesArray,
       });
+      onSuccess("Document published successfully");
+      handlePublishPopup();
+    } catch (err: any) {
+      console.error("Publishing runtime error:", err);
+      onSuccess("Failed to publish document");
+    } finally {
+      setIsPublishing(false);
+    }
   };
+
   return (
-    <div
-      className={`bg-sky-200 h-150 shadow-2xl w-200 rounded-3xl ${props.isVisible ? "visible" : "hidden"} flex flex-col justify-between py-5 items-center absolute z-10 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2`}
-    >
-      <div className="flex h-full w-full justify-center items-center">
-        <button className="bg-blue-600 p-2 rounded-xl m-10" onClick={publish}>
-          Publish
-        </button>
-      </div>
-      <div className="h-20 w-full flex flex-row justify-end items-end">
-        <button
-          className="bg-white p-4 m-4 rounded-2xl "
-          onClick={props.handlePublishPopup}
+    <AnimatePresence>
+      {isVisible && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+          onClick={handlePublishPopup}
         >
-          Close
-        </button>
-      </div>
-    </div>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: -20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: "spring", damping: 25, stiffness: 300 }}
+            onClick={(e) => e.stopPropagation()}
+            className="bg-[#FAFAFA] dark:bg-[#242424] rounded-[12px] shadow-2xl w-[480px] flex flex-col select-none overflow-hidden border border-[#E5E5E5] dark:border-[#333333]"
+            style={{ fontFamily: "Cantarell, 'Inter', sans-serif" }}
+          >
+            {/* Header / Titlebar - Gnome Style */}
+            <div className="flex items-center justify-between px-4 py-3 bg-[#EBEBEB] dark:bg-[#303030] border-b border-[#D4D4D4] dark:border-[#1F1F1F]">
+              <div className="flex-1"></div>
+              <h3 className="text-[14px] font-bold text-[#3D3D3D] dark:text-[#E6E6E6] flex-1 text-center whitespace-nowrap">
+                Publish Document
+              </h3>
+              <div className="flex-1 flex justify-end">
+                <button
+                  onClick={handlePublishPopup}
+                  className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#D4D4D4] dark:hover:bg-[#424242] text-[#3D3D3D] dark:text-[#E6E6E6] transition-colors"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            </div>
+
+            {/* Content Body */}
+            <div className="p-6 flex flex-col gap-5">
+              <div className="flex flex-col gap-2">
+                <label className="text-[12px] font-medium text-[#5E5E5E] dark:text-[#A1A1A1]">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={publishTitle}
+                  onChange={(e) => setPublishTitle(e.target.value)}
+                  disabled={isPublishing}
+                  className="w-full text-[14px] text-[#3D3D3D] dark:text-[#E6E6E6] bg-white dark:bg-[#1E1E1E] border border-[#D4D4D4] dark:border-[#333333] rounded-[8px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3584E4] transition-all disabled:opacity-50"
+                  placeholder="Enter custom deployment title..."
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[12px] font-medium text-[#5E5E5E] dark:text-[#A1A1A1]">
+                  Categories (comma separated)
+                </label>
+                <input
+                  type="text"
+                  value={categoriesStr}
+                  onChange={(e) => setCategoriesStr(e.target.value)}
+                  disabled={isPublishing}
+                  className="w-full text-[14px] text-[#3D3D3D] dark:text-[#E6E6E6] bg-white dark:bg-[#1E1E1E] border border-[#D4D4D4] dark:border-[#333333] rounded-[8px] px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#3584E4] transition-all disabled:opacity-50"
+                  placeholder="e.g. Technology, Guide, Tutorial"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label className="text-[12px] font-medium text-[#5E5E5E] dark:text-[#A1A1A1]">
+                  Thumbnail Image
+                </label>
+                <div className="rounded-[8px] overflow-hidden border border-[#D4D4D4] dark:border-[#333333]">
+                  <ImageDropZone
+                    onUpload={(url) => setThumbnailUrl(url)}
+                  />
+                </div>
+                <div className="flex items-center gap-2 mt-1">
+                  <span className="text-[12px] font-medium text-[#5E5E5E] dark:text-[#A1A1A1] whitespace-nowrap">
+                    OR enter image URL:
+                  </span>
+                  <input
+                    type="url"
+                    value={thumbnailUrl}
+                    onChange={(e) => setThumbnailUrl(e.target.value)}
+                    disabled={isPublishing}
+                    className="flex-1 text-[13px] text-[#3D3D3D] dark:text-[#E6E6E6] bg-white dark:bg-[#1E1E1E] border border-[#D4D4D4] dark:border-[#333333] rounded-[6px] px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#3584E4] transition-all disabled:opacity-50"
+                    placeholder="https://example.com/image.jpg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Footer Actions */}
+            <div className="flex gap-3 justify-end px-6 py-4 bg-[#FAFAFA] dark:bg-[#242424]">
+              <button
+                onClick={handlePublishPopup}
+                disabled={isPublishing}
+                className="px-5 py-2 text-[14px] font-medium rounded-[8px] bg-[#EBEBEB] dark:bg-[#383838] text-[#3D3D3D] dark:text-[#E6E6E6] hover:bg-[#D4D4D4] dark:hover:bg-[#424242] transition-colors border border-[#D4D4D4] dark:border-[#1F1F1F] disabled:opacity-50 shadow-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePublishSubmit}
+                disabled={isPublishing}
+                className="px-5 py-2 text-[14px] font-medium rounded-[8px] bg-[#3584E4] text-white hover:bg-[#1C71D8] transition-colors flex items-center gap-2 disabled:opacity-70 min-w-[100px] justify-center shadow-sm"
+              >
+                {isPublishing ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <>
+                    <Globe size={16} />
+                    Publish
+                  </>
+                )}
+              </button>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 };

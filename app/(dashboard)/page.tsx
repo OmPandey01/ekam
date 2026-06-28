@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { FaPlus } from "react-icons/fa";
+import { FaLink } from "react-icons/fa";
 import ArticleCard from "@/components/article-card";
 import { useDocumentStore } from "@/store/documentStore";
 import { ProtectedRoute } from "@/components/ProtectedRoutes";
@@ -10,9 +11,13 @@ import { useState, useEffect } from "react";
 import api from "@/api-controllers/api";
 import Image from "next/image";
 
+import Loading from "@/components/skelton-loading";
+
 export default function Home() {
   const router = useRouter();
   const [collection, setCollection] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
   const thumbnailUrls: string[] = [
     "/thumbnails/thumbnail_1.jpg",
     "/thumbnails/thumbnail_2.jpg",
@@ -43,17 +48,18 @@ export default function Home() {
 
     const fetchData = async () => {
       try {
+        setLoading(true);
         const response = await api.get("articles/published/featured");
         // console.log("Response from server:", response);
 
         const data = response.data?.feed || [];
 
-        console.log(data[[0]]);
-
         setCollection(data);
         // console.log("Document array processed:", data);
       } catch (error) {
         console.error("Error fetching data:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -62,92 +68,259 @@ export default function Home() {
 
   return (
     <ProtectedRoute>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        className="h-full bg-amber-50 w-full flex flex-row justify-center items-center overflow-hidden"
-      >
-        <div className="m-0 h-full w-full  overflow-scroll  p-2">
-          <ul className="overflow-scroll flex flex-col gap-4 p-4">
-            {collection.map((entry) => {
-              // Check if thumbnail is genuinely missing or the string "null"
-              const hasThumbnail =
-                entry.thumbnail && entry.thumbnail !== "null";
-
-              return (
-                <li key={entry.document_id} className="list-none">
-                  <motion.div
-                    whileHover={{ y: -4 }}
-                    className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex flex-col md:flex-row w-full  h-auto md:h-28"
-                  >
-                    {/* Thumbnail / Gradient Container */}
-                    <div className="w-full md:w-48 h-22 md:h-full flex-shrink-0">
-                      <Image
-                        src={thumbnailUrls[0]}
-                        alt={entry.title}
-                        className="w-full h-full object-cover"
-                        width={200}
-                        height={200}
-                      />
-                    </div>
-
-                    {/* Content Container */}
-                    <div className="p-5 flex flex-col justify-between flex-grow">
-                      <div>
-                        <h3 className="text-xl font-bold text-gray-900 line-clamp-1 mb-1">
-                          {entry.title || "Untitled"}
-                        </h3>
-
-                        {/* Author Display (Safely accessing the object) */}
-                        <p className="text-sm text-gray-500 font-medium">
-                          By{" "}
-                          <span className="text-gray-700 font-semibold">
-                            {entry.author?.name || "Unknown"}
-                          </span>
-                        </p>
-                      </div>
-
-                      {/* Action Button */}
-                      <div className="mt-4 md:mt-0 flex justify-end">
-                        <button
-                          onClick={() => router.push(`/article/${entry.id}`)}
-                          className="px-4 py-2 bg-gray-900 text-white rounded-lg font-medium text-sm hover:bg-gray-800 active:scale-95 transition-all cursor-pointer"
-                        >
-                          Read Article
-                        </button>
-                      </div>
-                    </div>
-                  </motion.div>
-                </li>
-              );
-            })}
-
-            {collection.length === 0 && (
-              <li className="text-gray-500 text-center py-10">
-                No documents yet. Create your first one!
-              </li>
-            )}
-          </ul>
-        </div>
-
-        <motion.button
-          initial={{ opacity: 0, scale: 0, borderRadius: 50 }}
-          animate={{ opacity: 1, scale: 1, transition: { duration: 0.8 } }}
-          whileHover={{
-            scale: 1.1,
-            borderRadius: 50,
-            border: "2px solid lightblue",
-            boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)",
-          }}
-          exit={{ opacity: 0, scale: 0 }}
-          onClick={() => router.push("/editor")}
-          className="bg-gray-100 h-20 m-10 w-50 flex justify-center items-center p-10 absolute bottom-10 right-5"
+      {!loading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          className="h-full bg-amber-50 w-full flex flex-row justify-center items-center overflow-hidden"
         >
-          <FaPlus className="mr-2" size={20} />
-          <p className="font-bold text-2xl">Create</p>
-        </motion.button>
-      </motion.div>
+          <div className="m-0 h-full w-full  overflow-scroll  p-2">
+            <ul className="overflow-scroll flex flex-col gap-4 p-4">
+              {collection.map((entry, index) => {
+                const hasThumbnail =
+                  entry.thumbnail && entry.thumbnail !== "null";
+
+                // Fallback gradient colors cycling
+                const gradients = [
+                  "from-indigo-400 to-purple-500",
+                  "from-rose-400 to-pink-500",
+                  "from-amber-400 to-orange-500",
+                  "from-emerald-400 to-teal-500",
+                  "from-sky-400 to-blue-500",
+                ];
+                const gradientClass = gradients[index % gradients.length];
+
+                // Format date if available
+                const formattedDate = entry.publishedAt
+                  ? new Date(entry.publishedAt).toLocaleDateString("en-US", {
+                      month: "short",
+                      day: "numeric",
+                      year: "numeric",
+                    })
+                  : null;
+
+                // Reading time estimate
+                const readingTime = entry.readingTime
+                  ? `${entry.readingTime} min read`
+                  : entry.wordCount
+                    ? `${Math.max(1, Math.ceil(entry.wordCount / 200))} min read`
+                    : null;
+
+                return (
+                  <li key={entry.document_id} className="list-none group">
+                    <motion.div
+                      whileHover={{ y: -3 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      }}
+                      className="relative bg-white rounded-2xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.04),0_4px_12px_rgba(0,0,0,0.03)] hover:shadow-[0_2px_6px_rgba(0,0,0,0.06),0_8px_24px_rgba(0,0,0,0.06)] transition-shadow duration-500 flex flex-col md:flex-row w-full h-full border border-gray-100/80"
+                    >
+                      {/* Subtle accent line on the left (desktop) / top (mobile) */}
+                      <div
+                        className={`absolute top-0 left-0 w-full h-[3px] md:w-[3px] md:h-full bg-gradient-to-b ${gradientClass} opacity-60 group-hover:opacity-100 transition-opacity duration-500`}
+                      />
+
+                      {/* Thumbnail / Gradient Fallback */}
+                      <div className="w-full md:w-56 lg:w-64 h-44 md:h-auto flex-shrink-0 relative overflow-hidden bg-gray-50">
+                        {hasThumbnail ? (
+                          <Image
+                            src={entry.thumbnail}
+                            alt={entry.title || "Article thumbnail"}
+                            className="w-full h-full object-cover group-hover:scale-[1.03] transition-transform duration-700 ease-out"
+                            width={260}
+                            height={180}
+                          />
+                        ) : (
+                          <div
+                            className={`w-full h-full bg-gradient-to-br ${gradientClass} flex items-center justify-center`}
+                          >
+                            <span className="text-white/80 text-5xl font-light select-none">
+                              {(entry.title || "U")[0].toUpperCase()}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Category badge */}
+                        {entry.category && (
+                          <div className="absolute top-3 left-3">
+                            <span className="inline-flex items-center px-2.5 py-1 rounded-md text-[11px] font-semibold uppercase tracking-wider text-white bg-black/40 backdrop-blur-md border border-white/10">
+                              {entry.category}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Content Container */}
+                      <div className="p-5 md:p-6 lg:p-7 flex flex-col justify-between flex-grow min-w-0">
+                        {/* Top section */}
+                        <div className="min-w-0">
+                          {/* Meta row */}
+                          <div className="flex items-center gap-2.5 mb-2.5 flex-wrap">
+                            {formattedDate && (
+                              <time className="text-xs text-gray-400 font-medium tabular-nums">
+                                {formattedDate}
+                              </time>
+                            )}
+                            {formattedDate && readingTime && (
+                              <span className="w-1 h-1 rounded-full bg-gray-300 flex-shrink-0" />
+                            )}
+                            {readingTime && (
+                              <span className="text-xs text-gray-400 font-medium flex items-center gap-1">
+                                <svg
+                                  className="w-3 h-3"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={2}
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                  />
+                                </svg>
+                                {readingTime}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Title */}
+                          <h3 className="text-lg md:text-xl font-semibold text-gray-900 line-clamp-2 leading-snug mb-2 group-hover:text-gray-700 transition-colors duration-300">
+                            {entry.title || "Untitled"}
+                          </h3>
+
+                          {/* Excerpt */}
+                          {entry.excerpt && (
+                            <p className="text-sm text-gray-500 line-clamp-2 leading-relaxed mb-3">
+                              {entry.excerpt}
+                            </p>
+                          )}
+
+                          {/* Author */}
+                          <div className="flex items-center gap-2.5">
+                            {entry.author?.avatar ? (
+                              <Image
+                                src={entry.author.avatar}
+                                alt={entry.author.name || "Author"}
+                                className="w-6 h-6 rounded-full object-cover ring-2 ring-white"
+                                width={24}
+                                height={24}
+                              />
+                            ) : (
+                              <div className="w-6 h-6 rounded-full bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center ring-2 ring-white">
+                                <span className="text-[10px] font-bold text-gray-500">
+                                  {/* {(entry.author?.name || "U")[0].toUpperCase()} */}
+                                </span>
+                              </div>
+                            )}
+                            <span className="text-sm text-gray-500">
+                              <span className="font-medium text-gray-700">
+                                {entry.author?.name || "Unknown"}
+                              </span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Action row */}
+                        <div className="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            {/* Optional: like / bookmark icons */}
+                            {entry.likes != null && (
+                              <span className="flex items-center gap-1 text-xs text-gray-400">
+                                <svg
+                                  className="w-3.5 h-3.5"
+                                  fill="none"
+                                  viewBox="0 0 24 24"
+                                  strokeWidth={1.8}
+                                  stroke="currentColor"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 0 1 2.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 0 0 .322-1.672V2.75a.75.75 0 0 1 .75-.75 2.25 2.25 0 0 1 2.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 0 1-2.649 7.521c-.388.482-.987.729-1.605.729H13.48a4.53 4.53 0 0 1-1.423-.23l-3.114-1.04a4.501 4.501 0 0 0-1.423-.23H5.904m7.598-4.027A9.042 9.042 0 0 0 8.5 10.25H6.633"
+                                  />
+                                </svg>
+                                {entry.likes}
+                              </span>
+                            )}
+                          </div>
+
+                          <button
+                            onClick={() => router.push(`/article/${entry.id}`)}
+                            className="inline-flex items-center gap-1.5 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-gray-800 active:scale-[0.97] transition-all duration-200 cursor-pointer group/btn shadow-sm hover:shadow-md"
+                          >
+                            Read
+                            <svg
+                              className="w-3.5 h-3.5 group-hover/btn:translate-x-0.5 transition-transform duration-200"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              strokeWidth={2.5}
+                              stroke="currentColor"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  </li>
+                );
+              })}
+              {collection.length === 0 && (
+                <li className="text-gray-500 text-center py-10">
+                  No documents yet. Create your first one!
+                </li>
+              )}
+            </ul>
+          </div>
+
+          {/* Floating action buttons */}
+          <div className="absolute bottom-10 right-5 flex flex-col gap-3 items-end">
+            {/* Read any article button */}
+            {/* <motion.button
+            initial={{ opacity: 0, scale: 0, borderRadius: 50 }}
+            animate={{ opacity: 1, scale: 1, transition: { duration: 0.6, delay: 0.15 } }}
+            whileHover={{
+              scale: 1.08,
+              boxShadow: "5px 5px 20px rgba(139,92,246,0.35)",
+            }}
+            exit={{ opacity: 0, scale: 0 }}
+            onClick={() => router.push("/read-url")}
+            id="read-url-btn"
+            className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white h-14 flex justify-center items-center px-6 gap-2.5 rounded-2xl shadow-lg cursor-pointer"
+          >
+            <FaLink size={16} />
+            <p className="font-semibold text-base">Read any article</p>
+          </motion.button> */}
+
+            {/* Create button */}
+            <motion.button
+              initial={{ opacity: 0, scale: 0, borderRadius: 50 }}
+              animate={{ opacity: 1, scale: 1, transition: { duration: 0.8 } }}
+              whileHover={{
+                scale: 1.1,
+                borderRadius: 50,
+                border: "2px solid lightblue",
+                boxShadow: "5px 5px 10px rgba(0, 0, 0, 0.3)",
+              }}
+              exit={{ opacity: 0, scale: 0 }}
+              onClick={() => router.push("/editor")}
+              className="bg-gray-100 h-20 w-50 flex justify-center items-center p-10 cursor-pointer"
+            >
+              <FaPlus className="mr-2" size={20} />
+              <p className="font-bold text-2xl">Create</p>
+            </motion.button>
+          </div>
+        </motion.div>
+      )}
+      {loading && <Loading />}
     </ProtectedRoute>
   );
 }

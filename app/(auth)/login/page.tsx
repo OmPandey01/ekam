@@ -119,7 +119,7 @@ export function TextRendererWithTimer({ data }: { data: string[] }) {
 
   return (
     <div className="h-70 w-[40vw]">
-      <TextRenderer text={textToRender} />
+      <TextRenderer size={7} text={textToRender} />
     </div>
   );
 }

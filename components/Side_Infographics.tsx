@@ -71,7 +71,7 @@ export function TextRendererWithTimer({ data }: { data: string[] }) {
 
   return (
     <div className="min-h-[60vh]">
-      <TextRenderer text={textToRender} />
+      <TextRenderer size={7} text={textToRender} />
     </div>
   );
 }

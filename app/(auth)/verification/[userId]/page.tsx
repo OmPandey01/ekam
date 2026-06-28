@@ -184,6 +184,8 @@ export default function OtpVerificationPage() {
   };
 
   const handleVerify = async () => {
+    setIsLoading(true);
+    setError("");
     try {
       const user = await verifyOtp({
         userId,
@@ -191,35 +193,38 @@ export default function OtpVerificationPage() {
       });
 
       if (user) {
-        router.push("/login");
+        router.push("/");
       } else {
         setError("Verification failed. Please try again.");
       }
       // console.log("Verified user:", user);
     } catch (error) {
       // console.error("Verification failed:", error);
+      setError("Verification failed. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleResend = async () => {
     if (!canResend) return;
+    
+    setIsLoading(true);
+    setError("");
     try {
       const response = await api.get(`/auth/resend-otp/${userId}`);
       if (response.status !== 200) throw new Error("Failed to resend OTP");
+      
+      setCanResend(false);
+      setResendTimer(30);
+      setOtp(["", "", "", "", "", ""]);
+      inputRefs.current[0]?.focus();
+      console.log("Resending OTP...");
     } catch (error) {
       setError("Failed to resend OTP");
     } finally {
       setIsLoading(false);
     }
-    setCanResend(false);
-    setResendTimer(30);
-    // Call API to resend OTP
-    console.log("Resending OTP...");
-    // Clear any previous error
-    setError("");
-    // Reset OTP fields
-    setOtp(["", "", "", "", "", ""]);
-    inputRefs.current[0]?.focus();
   };
 
   return (

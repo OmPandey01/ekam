@@ -18,10 +18,7 @@ export type Page =
       type: PageType.TextWithMedia;
       text: string;
       image: string;
-    }
-  | { pageId: string; type: PageType.Quote; quote: string }
-  | { pageId: string; type: PageType.Collage; collage: string }
-  | { pageId: string; type: PageType.Links; links?: string[] };
+    };
 
 export type CoreDocument = {
   id: string; // Added ID for store management

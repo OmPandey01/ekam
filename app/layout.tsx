@@ -6,7 +6,7 @@ import { StoreSync } from "@/components/StoreSync";
 import ClientLayout from "@/components/layout/client-layout";
 
 import useAuthStore from "@/data/authStore";
-
+ 
 // ... font definitions ...
 
 export const metadata: Metadata = {
@@ -16,7 +16,7 @@ export const metadata: Metadata = {
     icon: "/ekam-logo.png", // Path to your logo in the public folder
   },
 };
-
+  
 export default function RootLayout({
   children,
 }: {

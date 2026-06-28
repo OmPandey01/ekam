@@ -48,7 +48,7 @@ export default function ArticleCard({
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.35, ease: "easeOut" }}
-      className="group relative flex w-full flex-col sm:flex-row gap-6 rounded-3xl border border-neutral-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-neutral-200/80"
+      className="group  flex w-full flex-col sm:flex-row gap-6 rounded-3xl border border-neutral-100 bg-white p-5 shadow-sm transition-all duration-300 hover:shadow-md hover:border-neutral-200/80"
     >
       {/* Left Column: Thumbnail or Beautiful Abstract Minimal Graphic */}
       <div className="relative h-44 w-full sm:w-44 sm:min-w-[11rem] flex-shrink-0 overflow-hidden rounded-2xl">
@@ -57,7 +57,7 @@ export default function ArticleCard({
             src={document.thumbnailUrl}
             alt={document.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-103"
+            className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
           />
         ) : (
           /* Beautiful Textless Placeholder Graphic */
@@ -106,25 +106,23 @@ export default function ArticleCard({
           </h2>
 
           {/* Meta Information (Author & Date) */}
-          {(document.author || document.createdAt) && (
-            <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-neutral-400">
-              {document.author && (
-                <div className="flex items-center gap-1">
-                  <User size={13} className="text-neutral-300" />
-                  <span className="truncate max-w-[140px]">
-                    <span>{document.author?.name}</span>
-                  </span>
-                </div>
-              )}
+          {document.author ||
+            (document.createdAt && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs font-medium text-neutral-400">
+                {document.author && (
+                  <div className="flex items-center gap-1">
+                    <User size={13} className="text-neutral-300" />
+                  </div>
+                )}
 
-              {document.createdAt && (
-                <div className="flex items-center gap-1">
-                  <Calendar size={13} className="text-neutral-300" />
-                  <span>{formatDate(document.createdAt)}</span>
-                </div>
-              )}
-            </div>
-          )}
+                {document.createdAt && (
+                  <div className="flex items-center gap-1">
+                    <Calendar size={13} className="text-neutral-300" />
+                    <span>{formatDate(document.createdAt)}</span>
+                  </div>
+                )}
+              </div>
+            ))}
 
           {/* Description (Optional) */}
           {document.description && (

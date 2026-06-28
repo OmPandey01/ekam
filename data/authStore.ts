@@ -196,10 +196,10 @@ const useAuthStore = create<AuthType>((set, get) => ({
     set({ isLoading: true, error: null });
 
     try {
-      const response = await api.post("/auth/verify-otp", { userId, otp });
+      const response: any = await api.post("/auth/verify-otp", { userId, otp });
 
       if (response.status === 200 || response.status === 201) {
-        set({ isLoading: false });
+        set({ user: response.data.user, isLoading: false });
 
         return {
           success: true,

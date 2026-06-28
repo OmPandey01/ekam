@@ -2,7 +2,7 @@
 import useSidebarStore from "@/data/sideBarStore";
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { FiHome, FiCompass, FiBook, FiUser } from "react-icons/fi";
+import { FiHome, FiCompass, FiSearch, FiUser } from "react-icons/fi";
 import { LuSquareLibrary } from "react-icons/lu";
 import { useRouter } from "next/navigation";
 
@@ -10,7 +10,7 @@ const navItems = [
   { title: "Home", url: "/", icon: FiHome },
   { title: "Explore", url: "/explore", icon: FiCompass },
   { title: "Stories", url: "/stories", icon: LuSquareLibrary },
-  { title: "Library", url: "/library", icon: FiBook },
+  { title: "Search", url: "/search", icon: FiSearch },
   { title: "Profile", url: "/profile", icon: FiUser },
 ];
 
@@ -56,7 +56,7 @@ export function AppSidebar() {
       style={{ display: shouldShow ? "block" : "none" }}
       onHoverStart={() => !isMobile && setIsExpanded(true)}
       onHoverEnd={() => !isMobile && setIsExpanded(false)}
-      className={` bg-amber-100    ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute left-2 top-2 h-screen" : ""}  block   `}
+      className={` bg-amber-100    ${isMobile ? "w-screen" : "w-[50px]"}  ${isMobile ? "absolute z-50 left-2 top-2 h-screen" : ""}  block   `}
     >
       <div className="relative flex flex-col rounded-2xl justify-between items-baseline w-full h-full">
         {navItems.map((item) => (

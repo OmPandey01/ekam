@@ -117,10 +117,16 @@ export default function Topbar() {
           <motion.input
             type="search"
             placeholder="Search..."
-            // whileHover={{ scale: 1.2 }}
-            // whileFocus={{ scale: 1.05, position: "relative", top: "5" }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="  rounded-full  h-10 border-none bg-gray-100 pl-9 text-sm focus-visible:ring-1 focus-visible:ring-gray-300 w-[60vw]"
+            onKeyDown={(e: React.KeyboardEvent<HTMLInputElement>) => {
+              if (e.key === "Enter") {
+                const q = e.currentTarget.value.trim();
+                if (q) {
+                  router.push(`/search?q=${encodeURIComponent(q)}`);
+                }
+              }
+            }}
           />
         </motion.div>
       </div>

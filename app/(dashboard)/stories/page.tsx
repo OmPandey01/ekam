@@ -35,6 +35,10 @@ export default function TabsLine() {
 }
 
 function UnlistedArticles() {
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
+
   const onDelete = async (id: string) => {
     const res = await api.delete(`/documents/${id}`, {
       withCredentials: true,
@@ -43,8 +47,7 @@ function UnlistedArticles() {
       setData(data.filter((doc: any) => doc.id !== id));
     }
   };
-  const [data, setData] = useState<any>(null);
-  const router = useRouter();
+
   const unlistedMotivations = [
     "Go on to write your first article",
     "Your activities will appear here,but first you need to write something",
@@ -53,40 +56,63 @@ function UnlistedArticles() {
 
   useEffect(() => {
     const fetchUnlistedArticles = async () => {
-      const response = await api.get("/documents/unpublished/me");
-      const data = response.data.documents;
-      console.log(" Published docs are   ", data);
-      setData(data);
+      try {
+        const response = await api.get("/documents/unpublished/me");
+        const docs = response.data.documents || [];
+        console.log(" Unpublished docs are   ", docs);
+        setData(docs);
+      } catch (error) {
+        console.error("Failed to fetch unlisted docs", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchUnlistedArticles();
   }, []);
-  return (
-    (data && (
-      <div>
-        {data.map((record: any, index: number) => (
-          <div
-            onClick={() => router.push(`/editor/?docId=${record.data.id}`)}
-            key={index}
-          >
-            <ArticleCard
-              onDelete={onDelete}
-              deleteMode={true}
-              document={record.data}
-            ></ArticleCard>
-          </div>
-        ))}
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
-    )) || (
+    );
+  }
+
+  if (data.length === 0) {
+    return (
       <div className="flex justify-center items-center h-screen w-full">
         <NoDataAvailable data={unlistedMotivations} />
       </div>
-    )
+    );
+  }
+
+  return (
+    <div>
+      {data.map((record: any, index: number) => (
+        <div
+          onClick={() => router.push(`/editor/?docId=${record.data.id}`)}
+          key={index}
+        >
+          <ArticleCard
+            onDelete={onDelete}
+            deleteMode={true}
+            document={{
+              ...record.data,
+              thumbnailUrl: record.thumbnail && record.thumbnail !== "null" ? record.thumbnail : undefined,
+              category: record.categories
+            }}
+          />
+        </div>
+      ))}
+    </div>
   );
 }
 
 function PublishedArticles() {
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+
   const onDelete = async (id: string) => {
     const res = await api.delete(`/documents/${id}`, {
       withCredentials: true,
@@ -95,46 +121,65 @@ function PublishedArticles() {
       setData(data.filter((doc: any) => doc.id !== id));
     }
   };
+
   const toPublishMotivations = [
     "Go ahead and publish your first article",
     "Let the world see that you exist in this corner of the world by sharing your first article",
   ];
 
   useEffect(() => {
-    const fetchUnlistedArticles = async () => {
-      const response: {
-        success: boolean;
-        count: number;
-        documents: any;
-        data: any;
-      } = await api.get("/documents/published/all");
-      const data = response.data.documents;
-      console.log("Published docs are ", data);
-      setData(data);
+    const fetchPublishedArticles = async () => {
+      try {
+        const response = await api.get("/documents/published/all");
+        const docs = response.data.documents || [];
+        console.log("Published docs are ", docs);
+        setData(docs);
+      } catch (error) {
+        console.error("Failed to fetch published docs", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
-    fetchUnlistedArticles();
+    fetchPublishedArticles();
   }, []);
-  return (
-    (data && (
-      <div>
-        {data.map((entry: any, index: number) => (
-          <div
-            onClick={() => router.push(`/editor/?docId=${entry.document_id}`)}
-            key={index}
-          >
-            <ArticleCard
-              onDelete={onDelete}
-              deleteMode={true}
-              document={entry.document.data}
-            ></ArticleCard>
-          </div>
-        ))}
+
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-[50vh]">
+        <div className="w-8 h-8 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
       </div>
-    )) || (
+    );
+  }
+
+  if (data.length === 0) {
+    return (
       <div className="flex justify-center items-center h-screen w-full">
         <NoDataAvailable data={toPublishMotivations} />
       </div>
-    )
+    );
+  }
+
+  return (
+    <div>
+      {data.map((entry: any, index: number) => (
+        <div
+          onClick={() =>
+            router.push(`/editor/?docId=${entry.document.data.id}`)
+          }
+          key={index}
+        >
+          <ArticleCard
+            onDelete={onDelete}
+            deleteMode={true}
+            document={{
+              ...entry.document.data,
+              thumbnailUrl: entry.thumbnail && entry.thumbnail !== "null" ? entry.thumbnail : undefined,
+              category: entry.categories
+            }}
+          />
+        </div>
+      ))}
+    </div>
   );
 }
 
